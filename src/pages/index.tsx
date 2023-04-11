@@ -1,12 +1,23 @@
+import React, { FormEvent, useContext, useState } from 'react';
 import Head from 'next/head';
+import Image from 'next/image';
 import { Button, Card, Col, Container, Form, InputGroup, Row, Spinner } from 'react-bootstrap';
 
+import { AuthContext } from '@/contexts/AuthContext';
 import logo from '../../public/logo.png';
-import Image from 'next/image';
-import React from 'react';
 
 export default function Home() {
-  const loading: boolean = false;
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { loginUser } = useContext(AuthContext);
+
+  async function handleLogin(event: FormEvent) {
+    setLoading(true);
+    event.preventDefault();
+    await loginUser({ username, password });
+    setLoading(false);
+  }
 
   return (
     <React.Fragment>
@@ -34,18 +45,30 @@ export default function Home() {
                   Installation Management
                   <i aria-hidden={true} className='fas fa-tools ms-2'></i>
                 </Card.Title>
-                <Form>
+                <Form onSubmit={handleLogin}>
                   <InputGroup className='mb-3'>
                     <InputGroup.Text>
                       <i aria-hidden={true} className='fas fa-user'></i>
                     </InputGroup.Text>
-                    <Form.Control type='text' placeholder='Username' />
+                    <Form.Control
+                      type='text'
+                      placeholder='Username'
+                      required={true}
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
                   </InputGroup>
                   <InputGroup className='mb-3'>
                     <InputGroup.Text>
                       <i aria-hidden={true} className='fas fa-lock'></i>
                     </InputGroup.Text>
-                    <Form.Control type='password' placeholder='Password' />
+                    <Form.Control
+                      type='password'
+                      placeholder='Password'
+                      required={true}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
                   </InputGroup>
                   <div className='d-grid'>
                     <Button type='submit' disabled={loading}>

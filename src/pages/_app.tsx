@@ -1,8 +1,16 @@
+import type { AppProps } from 'next/app';
+import { AuthProvider } from '@/contexts/AuthContext';
+
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../../node_modules/bootswatch/dist/cosmo/bootstrap.min.css';
 import './styles.css';
-import type { AppProps } from 'next/app';
 
-export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+function App({ Component, pageProps }: AppProps) {
+  return (
+    <AuthProvider>
+      <Component {...pageProps} />
+    </AuthProvider>
+  );
 }
+
+export default App;
