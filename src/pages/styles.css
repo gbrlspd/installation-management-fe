@@ -1,0 +1,11 @@
+body {
+  background-color: #eee;
+}
+
+.btn {
+  border-radius: 0;
+}
+
+.input-group-text {
+  border-radius: 0;
+}
