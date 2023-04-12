@@ -9,7 +9,7 @@ export function unauthenticatedPage<P>(fn: GetServerSideProps<P>) {
     if (cookies['@installationmanagement.token']) {
       return {
         redirect: {
-          destination: '/dashboard',
+          destination: '/companies',
           permanent: false,
         },
       };
