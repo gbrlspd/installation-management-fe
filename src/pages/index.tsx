@@ -1,10 +1,12 @@
 import React, { FormEvent, useContext, useState } from 'react';
+import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { Button, Card, Col, Container, Form, InputGroup, Row, Spinner } from 'react-bootstrap';
 
 import { AuthContext } from '@/contexts/AuthContext';
 import logo from '../../public/logo.png';
+import { unauthenticatedPage } from '@/utils/unauthenticatedPage';
 
 export default function Home() {
   const [username, setUsername] = useState('');
@@ -85,3 +87,9 @@ export default function Home() {
     </React.Fragment>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = unauthenticatedPage(async (ctx) => {
+  return {
+    props: {},
+  };
+});

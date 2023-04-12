@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useState, useEffect } from 'react';
 import { setCookie, parseCookies, destroyCookie } from 'nookies';
 import Router from 'next/router';
 import { api } from '@/services/apiClient';
@@ -39,6 +39,24 @@ export const AuthContext = createContext({} as AuthContextData);
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<UserProps>();
   const isAuthenticated = !!user;
+
+  /* Every time the component is loaded it's checked if its token is valid */
+  useEffect(() => {
+    const { '@installationmanagement.token': token } = parseCookies();
+
+    if (token) {
+      api
+        .get('/me')
+        .then((res) => {
+          const { id, username, email } = res.data;
+
+          setUser({ id, username, email });
+        })
+        .catch(() => {
+          logoutUser();
+        });
+    }
+  }, []);
 
   async function loginUser({ username, password }: LoginProps) {
     try {

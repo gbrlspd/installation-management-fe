@@ -1,3 +1,6 @@
+import { authenticatedPage } from '@/utils/authenticatedPage';
+import { GetServerSideProps } from 'next';
+
 export default function Dashboard() {
   return (
     <div>
@@ -5,3 +8,9 @@ export default function Dashboard() {
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = authenticatedPage(async (ctx) => {
+  return {
+    props: {},
+  };
+});
