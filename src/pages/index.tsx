@@ -66,14 +66,14 @@ export default function Home() {
                     </InputGroup.Text>
                     <Form.Control
                       type='password'
-                      placeholder='Password'
+                      placeholder='••••••••'
                       required={true}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </InputGroup>
                   <div className='d-grid'>
-                    <Button type='submit' disabled={loading}>
+                    <Button variant='info' type='submit' disabled={loading}>
                       Login
                       {loading && <Spinner size='sm' className='ms-2'></Spinner>}
                     </Button>
