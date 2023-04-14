@@ -15,12 +15,11 @@ import {
   OverlayTrigger,
   Row,
   Spinner,
-  Table,
   Tooltip,
 } from 'react-bootstrap';
 import { api } from '@/services/apiClient';
 import { apiConfiguration } from '@/services/api';
-import Link from 'next/link';
+import StoresTable from '@/components/StoresTable';
 
 interface StoreProps {
   company: {
@@ -98,58 +97,7 @@ export default function Stores({ stores }: StoresProps) {
             </Form>
           </Card.Header>
           <Card.Body className='p-0'>
-            <Table hover={true} className='mb-0'>
-              <thead className='bg-primary text-white'>
-                <tr>
-                  <th>
-                    Company
-                    <i aria-hidden={true} className='fas fa-arrow-down ms-2'></i>
-                  </th>
-                  <th className='text-center'>ID</th>
-                  <th>Name</th>
-                  <th>City</th>
-                  <th>Status</th>
-                  <th>Updated at</th>
-                  <th className='text-center'>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {storesList.map((store) => (
-                  <tr key={store.id} className='align-middle'>
-                    <td>{store.company.name}</td>
-                    <td className='fw-bold text-center'>{store.id}</td>
-                    <td className='fw-bold'>{store.name}</td>
-                    <td>{store.city}</td>
-                    <td>{store.status}</td>
-                    <td>{store.updated_at.split('T')[0]}</td>
-                    <td className='text-center'>
-                      <OverlayTrigger overlay={<Tooltip>Info</Tooltip>}>
-                        <Button size='sm' variant='info me-2'>
-                          <i aria-hidden={true} className='fas fa-info-circle'></i>
-                        </Button>
-                      </OverlayTrigger>
-                      <OverlayTrigger overlay={<Tooltip>Credentials</Tooltip>}>
-                        <Button size='sm' variant='warning me-2'>
-                          <i aria-hidden={true} className='fas fa-key'></i>
-                        </Button>
-                      </OverlayTrigger>
-                      <OverlayTrigger overlay={<Tooltip>Manage</Tooltip>}>
-                        <Link href={`/stores/${store.id}`}>
-                          <Button size='sm' variant='success' className='me-2'>
-                            <i aria-hidden={true} className='text-white fas fa-wrench'></i>
-                          </Button>
-                        </Link>
-                      </OverlayTrigger>
-                      <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                        <Button size='sm' variant='danger'>
-                          <i aria-hidden={true} className='fas fa-trash'></i>
-                        </Button>
-                      </OverlayTrigger>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+            <StoresTable storesList={storesList} />
           </Card.Body>
         </Card>
       </Container>
