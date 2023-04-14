@@ -83,36 +83,53 @@ export default function Users({ users }: UsersProps) {
                 </InputGroup.Text>
                 <Form.Control type='text' placeholder='Search...' />
               </InputGroup>
-              <Button variant='success' className='ms-2' onClick={toggleModal}>
-                <i aria-hidden={true} className='fas fa-plus'></i>
-              </Button>
-              <Button variant='info' className='ms-2' onClick={handleRefresh}>
-                <i aria-hidden={true} className='fas fa-sync-alt'></i>
-              </Button>
+              <OverlayTrigger overlay={<Tooltip>New</Tooltip>}>
+                <Button variant='success' className='ms-2' onClick={toggleModal}>
+                  <i aria-hidden={true} className='fas fa-plus'></i>
+                </Button>
+              </OverlayTrigger>
+              <OverlayTrigger overlay={<Tooltip>Refresh</Tooltip>}>
+                <Button variant='info' className='ms-2' onClick={handleRefresh}>
+                  <i aria-hidden={true} className='fas fa-sync-alt'></i>
+                </Button>
+              </OverlayTrigger>
             </Form>
           </Card.Header>
           <Card.Body className='p-0'>
-            <Table striped={true} hover={true} className='mb-0'>
+            <Table hover={true} className='mb-0'>
               <thead className='bg-primary text-white'>
                 <tr>
                   <th>
                     Company
-                    <i aria-hidden={true} className='fas fa-arrow-down ms-2 fw-semibold'></i>
+                    <i aria-hidden={true} className='fas fa-arrow-down ms-2'></i>
                   </th>
-                  <th>ID</th>
+                  <th>UUID</th>
                   <th>Username</th>
                   <th>Email</th>
                   <th>Updated at</th>
+                  <th className='text-center'>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {usersList.map((store) => (
-                  <tr key={store.id}>
-                    <td>{store.company.name}</td>
-                    <td>{store.id}</td>
-                    <td>{store.username}</td>
-                    <td>{store.email}</td>
-                    <td>{store.updated_at.split('T')[0]}</td>
+                {usersList.map((user) => (
+                  <tr key={user.id} className='align-middle'>
+                    <td>{user.company.name}</td>
+                    <td>{user.id}</td>
+                    <td className='fw-bold'>{user.username}</td>
+                    <td>{user.email}</td>
+                    <td>{user.updated_at.split('T')[0]}</td>
+                    <td className='text-center'>
+                      <OverlayTrigger overlay={<Tooltip>Edit</Tooltip>}>
+                        <Button size='sm' variant='success' className='me-2'>
+                          <i aria-hidden={true} className='text-white fas fa-wrench'></i>
+                        </Button>
+                      </OverlayTrigger>
+                      <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
+                        <Button size='sm' variant='danger'>
+                          <i aria-hidden={true} className='fas fa-trash'></i>
+                        </Button>
+                      </OverlayTrigger>
+                    </td>
                   </tr>
                 ))}
               </tbody>

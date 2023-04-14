@@ -21,6 +21,7 @@ import { authenticatedPage } from '@/utils/authenticatedPage';
 import Header from '@/components/Header';
 import { api } from '@/services/apiClient';
 import { apiConfiguration } from '@/services/api';
+import Link from 'next/link';
 
 interface CompanyProps {
   prefix: string;
@@ -44,12 +45,6 @@ export default function Companies({ companies }: CompaniesProps) {
   );
 
   const toggleModal = () => setShow(!show);
-
-  const renderTooltip = (props) => (
-    <Tooltip id='button-tooltip' {...props}>
-      More information can be added later on this company page
-    </Tooltip>
-  );
 
   async function handleRegister(event: FormEvent) {
     setLoading(true);
@@ -87,34 +82,58 @@ export default function Companies({ companies }: CompaniesProps) {
                 </InputGroup.Text>
                 <Form.Control type='text' placeholder='Search...' />
               </InputGroup>
-              <Button variant='success' className='ms-2' onClick={toggleModal}>
-                <i aria-hidden={true} className='fas fa-plus'></i>
-              </Button>
-              <Button variant='info' className='ms-2' onClick={handleRefresh}>
-                <i aria-hidden={true} className='fas fa-sync-alt'></i>
-              </Button>
+              <OverlayTrigger overlay={<Tooltip>New</Tooltip>}>
+                <Button variant='success' className='ms-2' onClick={toggleModal}>
+                  <i aria-hidden={true} className='fas fa-plus'></i>
+                </Button>
+              </OverlayTrigger>
+              <OverlayTrigger overlay={<Tooltip>Refresh</Tooltip>}>
+                <Button variant='info' className='ms-2' onClick={handleRefresh}>
+                  <i aria-hidden={true} className='fas fa-sync-alt'></i>
+                </Button>
+              </OverlayTrigger>
             </Form>
           </Card.Header>
           <Card.Body className='p-0'>
-            <Table striped={true} hover={true} className='mb-0'>
+            <Table hover={true} className='mb-0'>
               <thead className='bg-primary text-white'>
                 <tr>
                   <th>
                     Country
-                    <i aria-hidden={true} className='fas fa-arrow-down ms-2 fw-semibold'></i>
+                    <i aria-hidden={true} className='fas fa-arrow-down ms-2'></i>
                   </th>
-                  <th>Prefix</th>
+                  <th className='text-center'>Prefix</th>
                   <th>Name</th>
                   <th>Updated at</th>
+                  <th className='text-center'>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {companiesList.map((company) => (
-                  <tr key={company.prefix}>
+                  <tr key={company.prefix} className='align-middle'>
                     <td>{company.country}</td>
-                    <td>{company.prefix}</td>
-                    <td>{company.name}</td>
+                    <td className='fw-bold text-center'>{company.prefix}</td>
+                    <td className='fw-bold'>{company.name}</td>
                     <td>{company.updated_at.split('T')[0]}</td>
+                    <td className='text-center'>
+                      <OverlayTrigger overlay={<Tooltip>Info</Tooltip>}>
+                        <Button size='sm' variant='info me-2'>
+                          <i aria-hidden={true} className='fas fa-info-circle'></i>
+                        </Button>
+                      </OverlayTrigger>
+                      <OverlayTrigger overlay={<Tooltip>Manage</Tooltip>}>
+                        <Link href={`/companies/${company.prefix}`}>
+                          <Button size='sm' variant='success' className='me-2'>
+                            <i aria-hidden={true} className='text-white fas fa-wrench'></i>
+                          </Button>
+                        </Link>
+                      </OverlayTrigger>
+                      <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
+                        <Button size='sm' variant='danger'>
+                          <i aria-hidden={true} className='fas fa-trash'></i>
+                        </Button>
+                      </OverlayTrigger>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -126,12 +145,7 @@ export default function Companies({ companies }: CompaniesProps) {
       <Modal show={show} onHide={toggleModal} size='lg'>
         <Form onSubmit={handleRegister}>
           <Modal.Header className='bg-light'>
-            <Modal.Title className='w-100 d-flex justify-content-between align-items-center'>
-              New Company
-              <OverlayTrigger placement='auto' overlay={renderTooltip}>
-                <i aria-hidden={true} className='fas fa-info-circle ms-2'></i>
-              </OverlayTrigger>
-            </Modal.Title>
+            <Modal.Title>New Company</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Row className='g-3'>
