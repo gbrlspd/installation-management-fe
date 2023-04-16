@@ -16,7 +16,7 @@ import {
   Tooltip,
 } from 'react-bootstrap';
 
-import { authenticatedPage } from '@/utils/authenticatedPage';
+import { authenticatedPage } from '@/authentication/authenticatedPage';
 import Header from '@/components/Header';
 import { api } from '@/services/apiClient';
 import { apiConfiguration } from '@/services/api';

@@ -5,13 +5,6 @@
   font-style: normal;
 }
 
-/* @font-face {
-  font-family: 'Source Sans Pro';
-  src: url('../../public/fonts/SourceSansPro-Bold.ttf');
-  font-weight: bold;
-  font-style: normal;
-} */
-
 * {
   font-family: 'Source Sans Pro';
 }

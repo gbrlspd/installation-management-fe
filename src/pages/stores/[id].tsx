@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import React from 'react';
 import { GetServerSideProps } from 'next';
-import { authenticatedPage } from '@/utils/authenticatedPage';
+import { authenticatedPage } from '@/authentication/authenticatedPage';
 import Header from '@/components/Header';
 import { Button, Card, Container, Form, InputGroup } from 'react-bootstrap';
 import { useRouter } from 'next/router';

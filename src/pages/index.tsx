@@ -6,7 +6,7 @@ import { Button, Card, Col, Container, Form, InputGroup, Row, Spinner } from 're
 
 import { AuthContext } from '@/contexts/AuthContext';
 import logo from '../../public/logo.png';
-import { unauthenticatedPage } from '@/utils/unauthenticatedPage';
+import { unauthenticatedPage } from '@/authentication/unauthenticatedPage';
 
 export default function Home() {
   const [username, setUsername] = useState('');
