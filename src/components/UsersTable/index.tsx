@@ -1,7 +1,14 @@
 import React from 'react';
+import { api } from '@/services/apiClient';
+
 import { Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
 
-export default function UsersTable({ usersList }) {
+export default function UsersTable({ usersList, refresh }) {
+  async function handleDelete(id: string) {
+    await api.delete(`/user/${id}`);
+    refresh();
+  }
+
   return (
     <Table hover={true} className='mb-0'>
       <thead className='bg-primary text-white'>
@@ -32,7 +39,7 @@ export default function UsersTable({ usersList }) {
                 </Button>
               </OverlayTrigger>
               <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                <Button size='sm' variant='danger'>
+                <Button size='sm' variant='danger' onClick={() => handleDelete(user.id)}>
                   <i aria-hidden={true} className='fas fa-trash'></i>
                 </Button>
               </OverlayTrigger>

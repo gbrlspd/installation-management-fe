@@ -1,8 +1,15 @@
 import Link from 'next/link';
 import React from 'react';
+import { api } from '@/services/apiClient';
+
 import { Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
 
-export default function CompaniesTable({ companiesList }) {
+export default function CompaniesTable({ companiesList, refresh }) {
+  async function handleDelete(prefix: string) {
+    await api.delete(`/company/${prefix}`);
+    refresh();
+  }
+
   return (
     <Table hover={true} className='mb-0'>
       <thead className='bg-primary text-white'>
@@ -39,7 +46,7 @@ export default function CompaniesTable({ companiesList }) {
                 </Link>
               </OverlayTrigger>
               <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                <Button size='sm' variant='danger'>
+                <Button size='sm' variant='danger' onClick={() => handleDelete(company.prefix)}>
                   <i aria-hidden={true} className='fas fa-trash'></i>
                 </Button>
               </OverlayTrigger>

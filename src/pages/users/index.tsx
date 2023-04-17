@@ -105,7 +105,7 @@ export default function Users({ users }: IUserPage) {
             </Form>
           </Card.Header>
           <Card.Body className='p-0'>
-            <UsersTable usersList={usersList} />
+            <UsersTable usersList={usersList} refresh={handleRefresh} />
           </Card.Body>
         </Card>
       </Container>

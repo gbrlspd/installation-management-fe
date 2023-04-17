@@ -105,7 +105,7 @@ export default function Companies({ companies }: ICompanyPage) {
             </Form>
           </Card.Header>
           <Card.Body className='p-0'>
-            <CompaniesTable companiesList={companiesList} />
+            <CompaniesTable companiesList={companiesList} refresh={handleRefresh} />
           </Card.Body>
         </Card>
       </Container>
