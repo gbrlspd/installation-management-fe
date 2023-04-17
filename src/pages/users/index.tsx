@@ -4,7 +4,7 @@ import { GetServerSideProps } from 'next';
 import { authenticatedPage } from '@/authentication/authenticatedPage';
 import { api } from '@/services/apiClient';
 import { apiConfiguration } from '@/services/api';
-import { IUser } from '@/interfaces/user';
+import { IUserProps } from '@/interfaces/user';
 import Header from '@/components/Header';
 import UsersTable from '@/components/UsersTable';
 
@@ -23,11 +23,11 @@ import {
   Tooltip,
 } from 'react-bootstrap';
 
-interface IUserPage {
-  users: IUser[];
+interface IUserPageProps {
+  users: IUserProps[];
 }
 
-export default function Users({ users }: IUserPage) {
+export default function Users({ users }: IUserPageProps) {
   const initialState = { company_prefix: '', username: '', email: '', password: '' };
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);

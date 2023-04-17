@@ -1,43 +1,29 @@
 import Head from 'next/head';
-import React, { FormEvent, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
+import { Card, Container } from 'react-bootstrap';
+import { IStoreProps } from '@/interfaces/store';
+import { ICompanyProps } from '@/interfaces/company';
 import { authenticatedPage } from '@/authentication/authenticatedPage';
 import { api } from '@/services/apiClient';
 import { apiConfiguration } from '@/services/api';
-import { IStore } from '@/interfaces/store';
-import { ICompany } from '@/interfaces/company';
 import Header from '@/components/Header';
 import StoresTable from '@/components/StoresTable';
+import CardTableHeader from '@/components/CardTableHeader';
+import NewStoreModal, { INewStore } from '@/components/NewStoreModal';
 
-import {
-  Badge,
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Modal,
-  OverlayTrigger,
-  Row,
-  Spinner,
-  Tooltip,
-} from 'react-bootstrap';
-
-export interface IStorePage {
-  stores: IStore[];
-  companies: ICompany[];
+export interface IStorePageProps {
+  stores: IStoreProps[];
+  companies: ICompanyProps[];
 }
 
-export default function Stores({ stores, companies }: IStorePage) {
-  const initialState = { id: '', company_prefix: '', name: '', city: '', status: '' };
+export default function Stores({ stores, companies }: IStorePageProps) {
   const companiesList = companies;
-  const [show, setShow] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [registerLoading, setRegisterLoading] = useState(false);
   const [search, setSearch] = useState('');
-  const [newStore, setNewStore] = useState(initialState);
   const [storesList, setStoresList] = useState(stores || []);
-  const toggleModal = () => setShow(!show);
+  const toggleRegisterModal = () => setShowRegisterModal(!showRegisterModal);
 
   async function filterBySearch({ stores, search }) {
     const tempStores = stores.filter(
@@ -55,14 +41,30 @@ export default function Stores({ stores, companies }: IStorePage) {
     setStoresList(res.data.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
   }
 
-  async function handleRegister(event: FormEvent) {
-    setLoading(true);
-    event.preventDefault();
-    await api.post('/store', newStore);
-    toggleModal();
-    setLoading(false);
-    setNewStore(initialState);
-    handleRefresh();
+  async function handleRegister(data: INewStore) {
+    setRegisterLoading(true);
+    await api
+      .post('/store', data)
+      .then(() => {
+        setShowRegisterModal(false);
+        setRegisterLoading(false);
+        handleRefresh();
+      })
+      .catch((err) => {
+        console.log(err);
+        setRegisterLoading(false);
+      });
+  }
+
+  async function handleDelete(id: string) {
+    await api
+      .delete(`/store/${id}`)
+      .then(() => {
+        handleRefresh();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   useEffect(() => {
@@ -77,122 +79,28 @@ export default function Stores({ stores, companies }: IStorePage) {
       <Header />
       <Container>
         <Card>
-          <Card.Header>
-            <Card.Title className='mt-2 mb-3 d-flex align-items-center'>
-              Stores
-              <i aria-hidden={true} className='fas fa-store ms-2'></i>
-              <Badge className='ms-2 fw-normal bg-info'>{storesList.length}</Badge>
-            </Card.Title>
-            <Form className='d-flex mb-2'>
-              <InputGroup>
-                <InputGroup.Text>
-                  <i aria-hidden={true} className='fas fa-search'></i>
-                </InputGroup.Text>
-                <Form.Control
-                  type='text'
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder='Search...'
-                />
-              </InputGroup>
-              <OverlayTrigger overlay={<Tooltip>New</Tooltip>}>
-                <Button variant='success' className='ms-2' onClick={toggleModal}>
-                  <i aria-hidden={true} className='fas fa-plus'></i>
-                </Button>
-              </OverlayTrigger>
-              <OverlayTrigger overlay={<Tooltip>Refresh</Tooltip>}>
-                <Button variant='info' className='ms-2' onClick={handleRefresh}>
-                  <i aria-hidden={true} className='fas fa-sync-alt'></i>
-                </Button>
-              </OverlayTrigger>
-            </Form>
-          </Card.Header>
+          <CardTableHeader
+            title='Stores'
+            faIcon='fa-store'
+            itemQty={storesList.length}
+            search={search}
+            handleChangeSearch={(search) => setSearch(search)}
+            refreshTable={handleRefresh}
+            toggleRegisterModal={toggleRegisterModal}
+          />
           <Card.Body className='p-0'>
-            <StoresTable storesList={storesList} refresh={handleRefresh} />
+            <StoresTable storesList={storesList} refreshTable={handleRefresh} deleteStore={handleDelete} />
           </Card.Body>
         </Card>
       </Container>
-
-      <Modal show={show} onHide={toggleModal} size='lg'>
-        <Form onSubmit={handleRegister}>
-          <Modal.Header className='bg-light'>
-            <Modal.Title>New Store</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Row className='g-3'>
-              <Col md={3}>
-                <Form.Select
-                  value={newStore.company_prefix}
-                  onChange={(e) => setNewStore({ ...newStore, company_prefix: e.target.value })}>
-                  <option>Company</option>
-                  {companiesList.map((company) => (
-                    <option key={company.prefix} value={company.prefix}>
-                      {company.name}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Col>
-              <Col md={3}>
-                <InputGroup className='mb-3'>
-                  <InputGroup.Text>ID</InputGroup.Text>
-                  <Form.Control
-                    required={true}
-                    value={newStore.id}
-                    onChange={(e) => setNewStore({ ...newStore, id: e.target.value })}
-                    placeholder='JH'
-                  />
-                </InputGroup>
-              </Col>
-              <Col md={6}>
-                <InputGroup>
-                  <InputGroup.Text>City</InputGroup.Text>
-                  <Form.Control
-                    required={true}
-                    value={newStore.city}
-                    onChange={(e) => setNewStore({ ...newStore, city: e.target.value })}
-                    placeholder='Pretoria'
-                  />
-                </InputGroup>
-              </Col>
-            </Row>
-            <Row className='g-3'>
-              <Col md={8}>
-                <InputGroup>
-                  <InputGroup.Text>Name</InputGroup.Text>
-                  <Form.Control
-                    required={true}
-                    value={newStore.name}
-                    onChange={(e) => setNewStore({ ...newStore, name: e.target.value })}
-                    placeholder='Menlyn'
-                  />
-                </InputGroup>
-              </Col>
-              <Col md={4}>
-                <InputGroup>
-                  <InputGroup.Text>Status</InputGroup.Text>
-                  <Form.Control
-                    required={true}
-                    value={newStore.status}
-                    onChange={(e) => setNewStore({ ...newStore, status: e.target.value })}
-                    placeholder='Operational'
-                  />
-                </InputGroup>
-              </Col>
-            </Row>
-          </Modal.Body>
-          <Modal.Footer className='bg-light'>
-            <Button variant='danger' onClick={toggleModal}>
-              Cancel
-            </Button>
-            <div className='d-grid'>
-              <Button variant='info' type='submit' disabled={loading}>
-                Save Changes
-                {loading && <Spinner size='sm' className='ms-2'></Spinner>}
-              </Button>
-            </div>
-          </Modal.Footer>
-        </Form>
-      </Modal>
+      <NewStoreModal
+        loading={registerLoading}
+        companiesList={companiesList}
+        refreshTable={handleRefresh}
+        toggleRegisterModal={toggleRegisterModal}
+        isOpen={showRegisterModal}
+        onSubmit={handleRegister}
+      />
     </React.Fragment>
   );
 }

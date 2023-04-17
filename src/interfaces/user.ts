@@ -1,11 +1,11 @@
-export interface IUser {
+export interface IUserProps {
   company: {
     name: string;
   };
   id: string;
   username: string;
   email: string;
-  updated_at: string;
 
   created_at?: string;
+  updated_at?: string;
 }

@@ -1,4 +1,4 @@
-export interface IStore {
+export interface IStoreProps {
   company: {
     name: string;
   };
@@ -6,7 +6,6 @@ export interface IStore {
   name: string;
   city: string;
   status: string;
-  updated_at: string;
 
   installed_by?: string;
   installed_at?: string;
@@ -39,4 +38,5 @@ export interface IStore {
   controllers_model?: string;
   controllers_qty?: number;
   created_at?: string;
+  updated_at?: string;
 }

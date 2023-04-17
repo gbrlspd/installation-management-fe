@@ -1,10 +1,16 @@
 import Link from 'next/link';
 import React from 'react';
-import { api } from '@/services/apiClient';
+import { IStoreProps } from '@/interfaces/store';
 
 import { Alert, Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
 
-export default function StoresTable({ storesList, refresh }) {
+export interface IStoreTableProps {
+  storesList: IStoreProps[];
+  refreshTable: () => void;
+  deleteStore: (id: string) => void;
+}
+
+export default function StoresTable(props: IStoreTableProps) {
   const validateStatus = (status) => {
     switch (status) {
       case 'Operational':
@@ -13,11 +19,6 @@ export default function StoresTable({ storesList, refresh }) {
         return 'danger';
     }
   };
-
-  async function handleDelete(id: string) {
-    await api.delete(`/store/${id}`);
-    refresh();
-  }
 
   return (
     <Table hover={true} className='mb-0'>
@@ -36,7 +37,7 @@ export default function StoresTable({ storesList, refresh }) {
         </tr>
       </thead>
       <tbody>
-        {storesList.map((store) => (
+        {props.storesList.map((store) => (
           <tr key={store.id} className='align-middle'>
             <td>{store.company.name}</td>
             <td className='text-center fw-bold'>{store.id}</td>
@@ -51,7 +52,6 @@ export default function StoresTable({ storesList, refresh }) {
               </Alert>
             </td>
             <td>{store.updated_at.split('T')[0]}</td>
-
             <td className='text-center'>
               <OverlayTrigger overlay={<Tooltip>Info</Tooltip>}>
                 <Button size='sm' variant='info me-2'>
@@ -71,7 +71,7 @@ export default function StoresTable({ storesList, refresh }) {
                 </Link>
               </OverlayTrigger>
               <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                <Button size='sm' variant='danger' onClick={() => handleDelete(store.id)}>
+                <Button size='sm' variant='danger' onClick={() => props.deleteStore(store.id)}>
                   <i aria-hidden={true} className='fas fa-trash'></i>
                 </Button>
               </OverlayTrigger>

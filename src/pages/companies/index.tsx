@@ -4,7 +4,7 @@ import { GetServerSideProps } from 'next';
 import { authenticatedPage } from '@/authentication/authenticatedPage';
 import { api } from '@/services/apiClient';
 import { apiConfiguration } from '@/services/api';
-import { ICompany } from '@/interfaces/company';
+import { ICompanyProps } from '@/interfaces/company';
 import Header from '@/components/Header';
 import CompaniesTable from '@/components/CompaniesTable';
 
@@ -23,11 +23,11 @@ import {
   Tooltip,
 } from 'react-bootstrap';
 
-interface ICompanyPage {
-  companies: ICompany[];
+interface ICompanyPageProps {
+  companies: ICompanyProps[];
 }
 
-export default function Companies({ companies }: ICompanyPage) {
+export default function Companies({ companies }: ICompanyPageProps) {
   const initialState = { prefix: '', name: '', country: '' };
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -60,6 +60,10 @@ export default function Companies({ companies }: ICompanyPage) {
     setLoading(false);
     setNewCompany(initialState);
     handleRefresh();
+  }
+
+  async function chamarOPai() {
+    console.log('pai chamado');
   }
 
   useEffect(() => {

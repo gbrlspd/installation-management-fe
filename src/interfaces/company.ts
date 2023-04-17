@@ -1,8 +1,7 @@
-export interface ICompany {
+export interface ICompanyProps {
   prefix: string;
   name: string;
   country: string;
-  updated_at: string;
 
   crm_url?: string;
   opb_url?: string;
@@ -11,4 +10,5 @@ export interface ICompany {
   owner_name?: string;
   owner_email?: string;
   created_at?: string;
+  updated_at?: string;
 }
