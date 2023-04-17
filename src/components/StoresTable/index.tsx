@@ -1,12 +1,10 @@
 import Link from 'next/link';
 import React from 'react';
 import { IStoreProps } from '@/interfaces/store';
-
 import { Alert, Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
 
 export interface IStoreTableProps {
   storesList: IStoreProps[];
-  refreshTable: () => void;
   deleteStore: (id: string) => void;
 }
 

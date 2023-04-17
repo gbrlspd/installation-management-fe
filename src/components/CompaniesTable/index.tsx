@@ -1,15 +1,14 @@
 import Link from 'next/link';
 import React from 'react';
-import { api } from '@/services/apiClient';
-
 import { Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
+import { ICompanyProps } from '@/interfaces/company';
 
-export default function CompaniesTable({ companiesList, refresh }) {
-  async function handleDelete(prefix: string) {
-    await api.delete(`/company/${prefix}`);
-    refresh();
-  }
+export interface ICompanyTableProps {
+  companiesList: ICompanyProps[];
+  deleteCompany: (id: string) => void;
+}
 
+export default function CompaniesTable(props) {
   return (
     <Table hover={true} className='mb-0'>
       <thead className='bg-primary text-white'>
@@ -25,7 +24,7 @@ export default function CompaniesTable({ companiesList, refresh }) {
         </tr>
       </thead>
       <tbody>
-        {companiesList.map((company) => (
+        {props.companiesList.map((company) => (
           <tr key={company.prefix} className='align-middle'>
             <td>{company.country}</td>
             <td className='text-center fw-bold'>{company.prefix}</td>
@@ -46,7 +45,7 @@ export default function CompaniesTable({ companiesList, refresh }) {
                 </Link>
               </OverlayTrigger>
               <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                <Button size='sm' variant='danger' onClick={() => handleDelete(company.prefix)}>
+                <Button size='sm' variant='danger' onClick={() => props.deleteCompany(company.prefix)}>
                   <i aria-hidden={true} className='fas fa-trash'></i>
                 </Button>
               </OverlayTrigger>

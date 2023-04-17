@@ -89,7 +89,7 @@ export default function Stores({ stores, companies }: IStorePageProps) {
             toggleRegisterModal={toggleRegisterModal}
           />
           <Card.Body className='p-0'>
-            <StoresTable storesList={storesList} refreshTable={handleRefresh} deleteStore={handleDelete} />
+            <StoresTable storesList={storesList} deleteStore={handleDelete} />
           </Card.Body>
         </Card>
       </Container>

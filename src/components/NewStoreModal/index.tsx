@@ -48,11 +48,13 @@ export default function NewStoreModal(props: INewStoreModalProps) {
             <Col md={3}>
               <Form.Select name='company_prefix' value={newStore.company_prefix} onChange={handleInputChange}>
                 <option>Company</option>
-                {props.companiesList.map((company) => (
-                  <option key={company.prefix} value={company.prefix}>
-                    {company.name}
-                  </option>
-                ))}
+                {props.companiesList
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((company) => (
+                    <option key={company.prefix} value={company.prefix}>
+                      {company.name}
+                    </option>
+                  ))}
               </Form.Select>
             </Col>
             <Col md={3}>
