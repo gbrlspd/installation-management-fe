@@ -1,8 +1,13 @@
 import Head from 'next/head';
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
 import { authenticatedPage } from '@/authentication/authenticatedPage';
+import { api } from '@/services/apiClient';
+import { apiConfiguration } from '@/services/api';
+import { IUser } from '@/interfaces/user';
 import Header from '@/components/Header';
+import UsersTable from '@/components/UsersTable';
+
 import {
   Badge,
   Button,
@@ -17,35 +22,35 @@ import {
   Spinner,
   Tooltip,
 } from 'react-bootstrap';
-import { apiConfiguration } from '@/services/api';
-import { api } from '@/services/apiClient';
-import UsersTable from '@/components/UsersTable';
 
-interface UserProps {
-  company: {
-    name: string;
-  };
-  id: string;
-  username: string;
-  email: string;
-  updated_at: string;
+interface IUserPage {
+  users: IUser[];
 }
 
-interface UsersProps {
-  users: UserProps[];
-}
-
-export default function Users({ users }: UsersProps) {
+export default function Users({ users }: IUserPage) {
   const initialState = { company_prefix: '', username: '', email: '', password: '' };
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState('');
   const [newUser, setNewUser] = useState(initialState);
-  const [usersList, setUsersList] = useState(
-    /* This function sorts an array alphabetically based on the given field */
-    users.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)) || []
-  );
-
+  const [usersList, setUsersList] = useState(users || []);
   const toggleModal = () => setShow(!show);
+
+  async function filterBySearch({ users, search }) {
+    const tempUsers = users.filter(
+      (user) =>
+        user.username.toLowerCase().includes(search.toLowerCase()) ||
+        user.email.toLowerCase().includes(search.toLowerCase()) ||
+        user.company.name.toLowerCase().includes(search.toLowerCase())
+    );
+    /* This function sorts an array alphabetically based on the given field */
+    setUsersList(tempUsers.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
+  }
+
+  async function handleRefresh() {
+    const res = await api.get('/user');
+    setUsersList(res.data.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
+  }
 
   async function handleRegister(event: FormEvent) {
     setLoading(true);
@@ -57,10 +62,9 @@ export default function Users({ users }: UsersProps) {
     handleRefresh();
   }
 
-  async function handleRefresh() {
-    const res = await api.get('/user');
-    setUsersList(res.data.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
-  }
+  useEffect(() => {
+    filterBySearch({ users, search });
+  }, [users, search]);
 
   return (
     <React.Fragment>
@@ -81,7 +85,12 @@ export default function Users({ users }: UsersProps) {
                 <InputGroup.Text>
                   <i aria-hidden={true} className='fas fa-search'></i>
                 </InputGroup.Text>
-                <Form.Control type='text' placeholder='Search...' />
+                <Form.Control
+                  type='text'
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder='Search...'
+                />
               </InputGroup>
               <OverlayTrigger overlay={<Tooltip>New</Tooltip>}>
                 <Button variant='success' className='ms-2' onClick={toggleModal}>

@@ -1,8 +1,9 @@
+import { api } from '@/services/apiClient';
 import Link from 'next/link';
 import React from 'react';
 import { Alert, Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
 
-export default function StoresTable({ storesList }) {
+export default function StoresTable({ storesList, refresh }) {
   const validateStatus = (status) => {
     switch (status) {
       case 'Operational':
@@ -11,6 +12,11 @@ export default function StoresTable({ storesList }) {
         return 'danger';
     }
   };
+
+  async function handleDelete(id: string) {
+    await api.delete(`/store/${id}`);
+    refresh();
+  }
 
   return (
     <Table hover={true} className='mb-0'>
@@ -39,8 +45,7 @@ export default function StoresTable({ storesList }) {
               <Alert
                 variant={validateStatus(store.status)}
                 className='px-2 py-1 m-0 d-flex align-items-center justify-content-center'
-                style={{ height: '31px' }}
-              >
+                style={{ height: '31px' }}>
                 {store.status}
               </Alert>
             </td>
@@ -65,7 +70,7 @@ export default function StoresTable({ storesList }) {
                 </Link>
               </OverlayTrigger>
               <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                <Button size='sm' variant='danger'>
+                <Button size='sm' variant='danger' onClick={() => handleDelete(store.id)}>
                   <i aria-hidden={true} className='fas fa-trash'></i>
                 </Button>
               </OverlayTrigger>

@@ -1,8 +1,14 @@
 import Head from 'next/head';
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
 import { authenticatedPage } from '@/authentication/authenticatedPage';
+import { api } from '@/services/apiClient';
+import { apiConfiguration } from '@/services/api';
+import { IStore } from '@/interfaces/store';
+import { ICompany } from '@/interfaces/company';
 import Header from '@/components/Header';
+import StoresTable from '@/components/StoresTable';
+
 import {
   Badge,
   Button,
@@ -17,36 +23,37 @@ import {
   Spinner,
   Tooltip,
 } from 'react-bootstrap';
-import { api } from '@/services/apiClient';
-import { apiConfiguration } from '@/services/api';
-import StoresTable from '@/components/StoresTable';
 
-interface StoreProps {
-  company: {
-    name: string;
-  };
-  id: string;
-  name: string;
-  city: string;
-  status: string;
-  updated_at: string;
+export interface IStorePage {
+  stores: IStore[];
+  companies: ICompany[];
 }
 
-interface StoresProps {
-  stores: StoreProps[];
-}
-
-export default function Stores({ stores }: StoresProps) {
+export default function Stores({ stores, companies }: IStorePage) {
   const initialState = { id: '', company_prefix: '', name: '', city: '', status: '' };
+  const companiesList = companies;
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState('');
   const [newStore, setNewStore] = useState(initialState);
-  const [storesList, setStoresList] = useState(
-    /* This function sorts an array alphabetically based on the given field */
-    stores.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)) || []
-  );
-
+  const [storesList, setStoresList] = useState(stores || []);
   const toggleModal = () => setShow(!show);
+
+  async function filterBySearch({ stores, search }) {
+    const tempStores = stores.filter(
+      (store) =>
+        store.name.toLowerCase().includes(search.toLowerCase()) ||
+        store.id.toLowerCase().includes(search.toLowerCase()) ||
+        store.company.name.toLowerCase().includes(search.toLowerCase())
+    );
+    /* This function sorts an array alphabetically based on the given field */
+    setStoresList(tempStores.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
+  }
+
+  async function handleRefresh() {
+    const res = await api.get('/store');
+    setStoresList(res.data.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
+  }
 
   async function handleRegister(event: FormEvent) {
     setLoading(true);
@@ -58,10 +65,9 @@ export default function Stores({ stores }: StoresProps) {
     handleRefresh();
   }
 
-  async function handleRefresh() {
-    const res = await api.get('/store');
-    setStoresList(res.data.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
-  }
+  useEffect(() => {
+    filterBySearch({ stores, search });
+  }, [stores, search]);
 
   return (
     <React.Fragment>
@@ -82,7 +88,12 @@ export default function Stores({ stores }: StoresProps) {
                 <InputGroup.Text>
                   <i aria-hidden={true} className='fas fa-search'></i>
                 </InputGroup.Text>
-                <Form.Control type='text' placeholder='Search...' />
+                <Form.Control
+                  type='text'
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder='Search...'
+                />
               </InputGroup>
               <OverlayTrigger overlay={<Tooltip>New</Tooltip>}>
                 <Button variant='success' className='ms-2' onClick={toggleModal}>
@@ -97,7 +108,7 @@ export default function Stores({ stores }: StoresProps) {
             </Form>
           </Card.Header>
           <Card.Body className='p-0'>
-            <StoresTable storesList={storesList} />
+            <StoresTable storesList={storesList} refresh={handleRefresh} />
           </Card.Body>
         </Card>
       </Container>
@@ -110,15 +121,16 @@ export default function Stores({ stores }: StoresProps) {
           <Modal.Body>
             <Row className='g-3'>
               <Col md={3}>
-                <InputGroup className='mb-3'>
-                  <InputGroup.Text>Prefix</InputGroup.Text>
-                  <Form.Control
-                    required={true}
-                    value={newStore.company_prefix}
-                    onChange={(e) => setNewStore({ ...newStore, company_prefix: e.target.value })}
-                    placeholder='I4'
-                  />
-                </InputGroup>
+                <Form.Select
+                  value={newStore.company_prefix}
+                  onChange={(e) => setNewStore({ ...newStore, company_prefix: e.target.value })}>
+                  <option>Company</option>
+                  {companiesList.map((company) => (
+                    <option key={company.prefix} value={company.prefix}>
+                      {company.name}
+                    </option>
+                  ))}
+                </Form.Select>
               </Col>
               <Col md={3}>
                 <InputGroup className='mb-3'>
@@ -187,11 +199,13 @@ export default function Stores({ stores }: StoresProps) {
 
 export const getServerSideProps: GetServerSideProps = authenticatedPage(async (ctx) => {
   const api = apiConfiguration(ctx);
-  const res = await api.get('/store');
+  const storesRes = await api.get('/store');
+  const companiesRes = await api.get('/company');
 
   return {
     props: {
-      stores: res.data,
+      stores: storesRes.data,
+      companies: companiesRes.data,
     },
   };
 });

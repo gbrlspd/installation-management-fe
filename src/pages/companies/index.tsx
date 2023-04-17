@@ -1,6 +1,13 @@
 import Head from 'next/head';
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
+import { authenticatedPage } from '@/authentication/authenticatedPage';
+import { api } from '@/services/apiClient';
+import { apiConfiguration } from '@/services/api';
+import { ICompany } from '@/interfaces/company';
+import Header from '@/components/Header';
+import CompaniesTable from '@/components/CompaniesTable';
+
 import {
   Badge,
   Button,
@@ -16,34 +23,34 @@ import {
   Tooltip,
 } from 'react-bootstrap';
 
-import { authenticatedPage } from '@/authentication/authenticatedPage';
-import Header from '@/components/Header';
-import { api } from '@/services/apiClient';
-import { apiConfiguration } from '@/services/api';
-import CompaniesTable from '@/components/CompaniesTable';
-
-interface CompanyProps {
-  prefix: string;
-  name: string;
-  country: string;
-  updated_at: string;
+interface ICompanyPage {
+  companies: ICompany[];
 }
 
-interface CompaniesProps {
-  companies: CompanyProps[];
-}
-
-export default function Companies({ companies }: CompaniesProps) {
+export default function Companies({ companies }: ICompanyPage) {
   const initialState = { prefix: '', name: '', country: '' };
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState('');
   const [newCompany, setNewCompany] = useState(initialState);
-  const [companiesList, setCompaniesList] = useState(
-    /* This function sorts an array alphabetically based on the given field */
-    companies.slice().sort((a, b) => a.country.localeCompare(b.country)) || []
-  );
-
+  const [companiesList, setCompaniesList] = useState(companies || []);
   const toggleModal = () => setShow(!show);
+
+  async function filterBySearch({ companies, search }) {
+    const tempCompanies = companies.filter(
+      (company) =>
+        company.name.toLowerCase().includes(search.toLowerCase()) ||
+        company.prefix.toLowerCase().includes(search.toLowerCase()) ||
+        company.country.toLowerCase().includes(search.toLowerCase())
+    );
+    /* This function sorts an array alphabetically based on the given field */
+    setCompaniesList(tempCompanies.slice().sort((a, b) => a.country.localeCompare(b.country)));
+  }
+
+  async function handleRefresh() {
+    const res = await api.get('/company');
+    setCompaniesList(res.data.slice().sort((a, b) => a.country.localeCompare(b.country)));
+  }
 
   async function handleRegister(event: FormEvent) {
     setLoading(true);
@@ -55,10 +62,9 @@ export default function Companies({ companies }: CompaniesProps) {
     handleRefresh();
   }
 
-  async function handleRefresh() {
-    const res = await api.get('/company');
-    setCompaniesList(res.data.slice().sort((a, b) => a.country.localeCompare(b.country)));
-  }
+  useEffect(() => {
+    filterBySearch({ companies, search });
+  }, [companies, search]);
 
   return (
     <React.Fragment>
@@ -79,7 +85,12 @@ export default function Companies({ companies }: CompaniesProps) {
                 <InputGroup.Text>
                   <i aria-hidden={true} className='fas fa-search'></i>
                 </InputGroup.Text>
-                <Form.Control type='text' placeholder='Search...' />
+                <Form.Control
+                  type='text'
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder='Search...'
+                />
               </InputGroup>
               <OverlayTrigger overlay={<Tooltip>New</Tooltip>}>
                 <Button variant='success' className='ms-2' onClick={toggleModal}>
