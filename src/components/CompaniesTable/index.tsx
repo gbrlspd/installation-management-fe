@@ -29,8 +29,8 @@ export default function CompaniesTable(props: ICompanyTableProps) {
         {props.companiesList.map((company) => (
           <tr key={company.prefix} className='align-middle'>
             <td className='d-none d-sm-table-cell'>{company.country}</td>
-            <td className='text-center fw-bold d-none d-sm-table-cell'>{company.prefix}</td>
-            <td className='fw-bold'>{company.name}</td>
+            <td className='text-center d-none d-sm-table-cell'>{company.prefix}</td>
+            <td>{company.name}</td>
             <td className='text-center d-none d-sm-table-cell'>{company.stores.length}</td>
             <td className='d-none d-sm-table-cell'>{company.updated_at.split('T')[0]}</td>
 

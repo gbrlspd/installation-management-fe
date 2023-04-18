@@ -1,6 +1,6 @@
 import { ICompanyProps } from '@/interfaces/company';
-import React, { FormEvent, useState } from 'react';
-import { Alert, Button, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-bootstrap';
+import React from 'react';
+import { Alert, Button, Col, Form, InputGroup, Modal, Row } from 'react-bootstrap';
 
 export interface ICompanyInfoModalProps {
   company: ICompanyProps;
@@ -9,26 +9,14 @@ export interface ICompanyInfoModalProps {
 }
 
 export default function CompanyInfoModal(props: ICompanyInfoModalProps) {
-  const {
-    prefix,
-    name,
-    country,
-    stores,
-    crm_url,
-    opb_url,
-    validator_code,
-    validator_qty,
-    owner_name,
-    owner_email,
-    created_at,
-    updated_at,
-  } = props.company;
+  const { prefix, name, country, crm_url, opb_url, validator_code, validator_qty, owner_name, owner_email } =
+    props.company;
 
   return (
     <Modal show={props.show} onHide={props.onClose} size='lg'>
       <Form>
         <Modal.Header className='bg-light'>
-          <Modal.Title className='d-flex'>{name}</Modal.Title>
+          <Modal.Title>{name}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Alert variant='warning'>

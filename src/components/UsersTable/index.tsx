@@ -28,7 +28,7 @@ export default function UsersTable(props: IUsersTableProps) {
           <tr key={user.id} className='align-middle'>
             <td className='d-none d-sm-table-cell'>{user.company.name}</td>
             <td className='d-none d-sm-table-cell'>{user.id}</td>
-            <td className='fw-bold'>{user.username}</td>
+            <td>{user.username}</td>
             <td className='d-none d-sm-table-cell'>{user.email}</td>
             <td className='d-none d-sm-table-cell'>{user.updated_at.split('T')[0]}</td>
             <td className='text-center'>

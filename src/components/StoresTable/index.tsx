@@ -6,6 +6,7 @@ import { Alert, Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
 export interface IStoreTableProps {
   storesList: IStoreProps[];
   deleteStore: (id: string) => void;
+  showStoreInfo: (id: string) => void;
 }
 
 export default function StoresTable(props: IStoreTableProps) {
@@ -38,8 +39,8 @@ export default function StoresTable(props: IStoreTableProps) {
         {props.storesList.map((store) => (
           <tr key={store.id} className='align-middle'>
             <td className='d-none d-sm-table-cell'>{store.company.name}</td>
-            <td className='text-center fw-bold d-none d-sm-table-cell'>{store.id}</td>
-            <td className='fw-bold'>{store.name}</td>
+            <td className='text-center d-none d-sm-table-cell'>{store.id}</td>
+            <td>{store.name}</td>
             <td className='d-none d-sm-table-cell'>{store.city}</td>
             <td className='text-center d-flex justify-content-center d-none d-sm-flex'>
               <Alert
@@ -52,7 +53,7 @@ export default function StoresTable(props: IStoreTableProps) {
             <td className='d-none d-sm-table-cell'>{store.updated_at.split('T')[0]}</td>
             <td className='text-center'>
               <OverlayTrigger overlay={<Tooltip>Info</Tooltip>}>
-                <Button size='sm' variant='info me-2'>
+                <Button size='sm' variant='info me-2' onClick={() => props.showStoreInfo(store.id)}>
                   <i aria-hidden={true} className='fas fa-info-circle'></i>
                 </Button>
               </OverlayTrigger>
