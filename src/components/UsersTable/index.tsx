@@ -16,7 +16,7 @@ export default function UsersTable(props: IUsersTableProps) {
             Company
             <i aria-hidden={true} className='fas fa-arrow-down ms-2'></i>
           </th>
-          <th>UUID</th>
+          <th>ID</th>
           <th>Username</th>
           <th>Email</th>
           <th>Updated at</th>

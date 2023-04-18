@@ -11,6 +11,7 @@ import Header from '@/components/Header';
 import StoresTable from '@/components/StoresTable';
 import CardTableHeader from '@/components/CardTableHeader';
 import NewStoreModal, { INewStore } from '@/components/NewStoreModal';
+import ConfirmationModal from '@/components/ConfirmationModal';
 
 export interface IStorePageProps {
   stores: IStoreProps[];
@@ -21,11 +22,13 @@ export default function Stores({ stores, companies }: IStorePageProps) {
   const companiesList = companies;
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [registerLoading, setRegisterLoading] = useState(false);
+  const [showDeletionModal, setShowDeletionModal] = useState(false);
+  const [selectedStoreToDelete, setSelectedStoreToDelete] = useState('');
   const [search, setSearch] = useState('');
   const [storesList, setStoresList] = useState(stores || []);
   const toggleRegisterModal = () => setShowRegisterModal(!showRegisterModal);
 
-  async function filterBySearch({ stores, search }) {
+  const filterBySearch = ({ stores, search }) => {
     const tempStores = stores.filter(
       (store) =>
         store.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -34,7 +37,7 @@ export default function Stores({ stores, companies }: IStorePageProps) {
     );
     /* This function sorts an array alphabetically based on the given field */
     setStoresList(tempStores.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
-  }
+  };
 
   async function handleRefresh() {
     const res = await api.get('/store');
@@ -56,15 +59,22 @@ export default function Stores({ stores, companies }: IStorePageProps) {
       });
   }
 
-  async function handleDelete(id: string) {
+  const handleDeleteClick = (id: string) => {
+    setSelectedStoreToDelete(id);
+    setShowDeletionModal(true);
+  };
+
+  async function handleConfirmDelete() {
     await api
-      .delete(`/store/${id}`)
+      .delete(`/store/${selectedStoreToDelete}`)
       .then(() => {
         handleRefresh();
       })
       .catch((err) => {
         console.log(err);
       });
+    setSelectedStoreToDelete('');
+    setShowDeletionModal(false);
   }
 
   useEffect(() => {
@@ -89,10 +99,15 @@ export default function Stores({ stores, companies }: IStorePageProps) {
             toggleRegisterModal={toggleRegisterModal}
           />
           <Card.Body className='p-0'>
-            <StoresTable storesList={storesList} deleteStore={handleDelete} />
+            <StoresTable storesList={storesList} deleteStore={handleDeleteClick} />
           </Card.Body>
         </Card>
       </Container>
+      <ConfirmationModal
+        show={showDeletionModal}
+        onClose={() => setShowDeletionModal(false)}
+        onConfirm={handleConfirmDelete}
+      />
       <NewStoreModal
         loading={registerLoading}
         companiesList={companiesList}

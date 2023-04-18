@@ -2,6 +2,11 @@ export interface ICompanyProps {
   prefix: string;
   name: string;
   country: string;
+  stores?: {
+    length: number;
+    id: string;
+    name: string;
+  };
 
   crm_url?: string;
   opb_url?: string;

@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
-import { Card, Container } from 'react-bootstrap';
+import { Button, Card, Container, Modal } from 'react-bootstrap';
 import { IUserProps } from '@/interfaces/user';
 import { ICompanyProps } from '@/interfaces/company';
 import { authenticatedPage } from '@/authentication/authenticatedPage';
@@ -11,21 +11,26 @@ import Header from '@/components/Header';
 import UsersTable from '@/components/UsersTable';
 import CardTableHeader from '@/components/CardTableHeader';
 import NewUserModal, { INewUser } from '@/components/NewUserModal';
+import ConfirmationModal from '@/components/ConfirmationModal';
 
 interface IUserPageProps {
+  user: IUserProps;
   users: IUserProps[];
   companies: ICompanyProps[];
 }
 
-export default function Users({ users, companies }: IUserPageProps) {
+export default function Users({ users, user, companies }: IUserPageProps) {
   const companiesList = companies;
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [registerLoading, setRegisterLoading] = useState(false);
+  const [showDeletionModal, setShowDeletionModal] = useState(false);
+  const [selectedUserToDelete, setSelectedUserToDelete] = useState('');
   const [search, setSearch] = useState('');
   const [usersList, setUsersList] = useState(users || []);
+  const [selectedUser, setSelectedUser] = useState(user);
   const toggleRegisterModal = () => setShowRegisterModal(!showRegisterModal);
 
-  async function filterBySearch({ users, search }) {
+  const filterBySearch = ({ users, search }) => {
     const tempUsers = users.filter(
       (user) =>
         user.username.toLowerCase().includes(search.toLowerCase()) ||
@@ -34,7 +39,7 @@ export default function Users({ users, companies }: IUserPageProps) {
     );
     /* This function sorts an array alphabetically based on the given field */
     setUsersList(tempUsers.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
-  }
+  };
 
   async function handleRefresh() {
     const res = await api.get('/user');
@@ -56,15 +61,22 @@ export default function Users({ users, companies }: IUserPageProps) {
       });
   }
 
-  async function handleDelete(id: string) {
+  const handleDeleteClick = (id: string) => {
+    setSelectedUserToDelete(id);
+    setShowDeletionModal(true);
+  };
+
+  async function handleConfirmDelete() {
     await api
-      .delete(`/user/${id}`)
+      .delete(`/user/${selectedUserToDelete}`)
       .then(() => {
         handleRefresh();
       })
       .catch((err) => {
         console.log(err);
       });
+    setSelectedUserToDelete('');
+    setShowDeletionModal(false);
   }
 
   useEffect(() => {
@@ -89,10 +101,15 @@ export default function Users({ users, companies }: IUserPageProps) {
             toggleRegisterModal={toggleRegisterModal}
           />
           <Card.Body className='p-0'>
-            <UsersTable usersList={usersList} deleteUser={handleDelete} />
+            <UsersTable usersList={usersList} deleteUser={handleDeleteClick} />
           </Card.Body>
         </Card>
       </Container>
+      <ConfirmationModal
+        show={showDeletionModal}
+        onClose={() => setShowDeletionModal(false)}
+        onConfirm={handleConfirmDelete}
+      />
       <NewUserModal
         loading={registerLoading}
         companiesList={companiesList}

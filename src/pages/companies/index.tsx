@@ -10,19 +10,27 @@ import Header from '@/components/Header';
 import CompaniesTable from '@/components/CompaniesTable';
 import CardTableHeader from '@/components/CardTableHeader';
 import NewCompanyModal, { INewCompany } from '@/components/NewCompanyModal';
+import CompanyInfoModal from '@/components/CompanyInfoModal';
+import ConfirmationModal from '@/components/ConfirmationModal';
 
 interface ICompanyPageProps {
+  company: ICompanyProps;
   companies: ICompanyProps[];
 }
 
-export default function Companies({ companies }: ICompanyPageProps) {
+export default function Companies({ companies, company }: ICompanyPageProps) {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [registerLoading, setRegisterLoading] = useState(false);
+  const [showDeletionModal, setShowDeletionModal] = useState(false);
+  const [selectedCompanyToDelete, setSelectedCompanyToDelete] = useState('');
+  const [showInfoModal, setShowInfoModal] = useState(false);
   const [search, setSearch] = useState('');
   const [companiesList, setCompaniesList] = useState(companies || []);
+  const [selectedCompany, setSelectedCompany] = useState(company);
   const toggleRegisterModal = () => setShowRegisterModal(!showRegisterModal);
+  const toggleInfoModal = () => setShowInfoModal(!showInfoModal);
 
-  async function filterBySearch({ companies, search }) {
+  const filterBySearch = ({ companies, search }) => {
     const tempCompanies = companies.filter(
       (company) =>
         company.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -31,12 +39,24 @@ export default function Companies({ companies }: ICompanyPageProps) {
     );
     /* This function sorts an array alphabetically based on the given field */
     setCompaniesList(tempCompanies.slice().sort((a, b) => a.country.localeCompare(b.country)));
-  }
+  };
 
   async function handleRefresh() {
     const res = await api.get('/company');
     setCompaniesList(res.data.slice().sort((a, b) => a.country.localeCompare(b.country)));
   }
+
+  // async function handleInfoModal(prefix: string) {
+  //   await api
+  //     .get(`/company/${prefix}`)
+  //     .then((res) => {
+  //       setSelectedCompany(res.data);
+  //       setShowInfoModal(true);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }
 
   async function handleRegister(data: INewCompany) {
     setRegisterLoading(true);
@@ -53,15 +73,22 @@ export default function Companies({ companies }: ICompanyPageProps) {
       });
   }
 
-  async function handleDelete(prefix: string) {
+  const handleDeleteClick = (id: string) => {
+    setSelectedCompanyToDelete(id);
+    setShowDeletionModal(true);
+  };
+
+  async function handleConfirmDelete() {
     await api
-      .delete(`/company/${prefix}`)
+      .delete(`/company/${selectedCompanyToDelete}`)
       .then(() => {
         handleRefresh();
       })
       .catch((err) => {
         console.log(err);
       });
+    setSelectedCompanyToDelete('');
+    setShowDeletionModal(false);
   }
 
   useEffect(() => {
@@ -86,10 +113,19 @@ export default function Companies({ companies }: ICompanyPageProps) {
             toggleRegisterModal={toggleRegisterModal}
           />
           <Card.Body className='p-0'>
-            <CompaniesTable companiesList={companiesList} deleteCompany={handleDelete} />
+            <CompaniesTable
+              companiesList={companiesList}
+              deleteCompany={handleDeleteClick}
+              showCompanyInfo={() => {}}
+            />
           </Card.Body>
         </Card>
       </Container>
+      <ConfirmationModal
+        show={showDeletionModal}
+        onClose={() => setShowDeletionModal(false)}
+        onConfirm={handleConfirmDelete}
+      />
       <NewCompanyModal
         loading={registerLoading}
         refreshTable={handleRefresh}
@@ -97,6 +133,7 @@ export default function Companies({ companies }: ICompanyPageProps) {
         isOpen={showRegisterModal}
         onSubmit={handleRegister}
       />
+      {/* <CompanyInfoModal isOpen={showInfoModal} toggleInfoModal={toggleInfoModal} company={selectedCompany} /> */}
     </React.Fragment>
   );
 }
