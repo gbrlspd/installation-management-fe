@@ -60,7 +60,7 @@ export default function NewCompanyModal(props: INewCompanyModalProps) {
                   required={true}
                   value={newCompany.country}
                   onChange={handleInputChange}
-                  placeholder='JH'
+                  placeholder='South Africa'
                 />
               </InputGroup>
             </Col>

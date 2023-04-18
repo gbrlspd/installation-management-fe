@@ -1,14 +1,13 @@
 import React from 'react';
-import { api } from '@/services/apiClient';
-
+import { IUserProps } from '@/interfaces/user';
 import { Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
 
-export default function UsersTable({ usersList, refresh }) {
-  async function handleDelete(id: string) {
-    await api.delete(`/user/${id}`);
-    refresh();
-  }
+export interface IUsersTableProps {
+  usersList: IUserProps[];
+  deleteUser: (id: string) => void;
+}
 
+export default function UsersTable(props: IUsersTableProps) {
   return (
     <Table hover={true} className='mb-0'>
       <thead className='bg-primary text-white'>
@@ -25,7 +24,7 @@ export default function UsersTable({ usersList, refresh }) {
         </tr>
       </thead>
       <tbody>
-        {usersList.map((user) => (
+        {props.usersList.map((user) => (
           <tr key={user.id} className='align-middle'>
             <td>{user.company.name}</td>
             <td>{user.id}</td>
@@ -39,7 +38,7 @@ export default function UsersTable({ usersList, refresh }) {
                 </Button>
               </OverlayTrigger>
               <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                <Button size='sm' variant='danger' onClick={() => handleDelete(user.id)}>
+                <Button size='sm' variant='danger' onClick={() => props.deleteUser(user.id)}>
                   <i aria-hidden={true} className='fas fa-trash'></i>
                 </Button>
               </OverlayTrigger>

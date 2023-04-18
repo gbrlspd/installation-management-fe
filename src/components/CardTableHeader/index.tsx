@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { Badge, Button, Card, Form, InputGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 export interface ICardTableHeaderProps {
@@ -16,7 +15,7 @@ export default function CardTableHeader(props: ICardTableHeaderProps) {
   return (
     <Card.Header>
       <Card.Title className='mt-2 mb-3 d-flex align-items-center'>
-        Stores
+        {props.title}
         <i aria-hidden={true} className={`fas ${props.faIcon} ms-2`}></i>
         <Badge className='ms-2 fw-normal bg-info'>{props.itemQty}</Badge>
       </Card.Title>

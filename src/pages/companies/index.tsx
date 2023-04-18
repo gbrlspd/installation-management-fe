@@ -77,7 +77,7 @@ export default function Companies({ companies }: ICompanyPageProps) {
       <Container>
         <Card>
           <CardTableHeader
-            title='Stores'
+            title='Companies'
             faIcon='fa-landmark'
             itemQty={companiesList.length}
             search={search}

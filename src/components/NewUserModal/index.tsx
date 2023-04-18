@@ -2,50 +2,49 @@ import React, { FormEvent, useState } from 'react';
 import { ICompanyProps } from '@/interfaces/company';
 import { Button, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-bootstrap';
 
-export interface INewStore {
-  id: string;
+export interface INewUser {
   company_prefix: string;
-  name: string;
-  city: string;
-  status: string;
+  username: string;
+  email: string;
+  password: string;
 }
 
-export interface INewStoreModalProps {
+export interface INewUserModalProps {
   loading: boolean;
   isOpen: boolean;
   companiesList: ICompanyProps[];
-  onSubmit: (data: INewStore) => void;
+  onSubmit: (data: INewUser) => void;
   refreshTable: () => void;
   toggleRegisterModal: () => void;
 }
 
-export default function NewStoreModal(props: INewStoreModalProps) {
-  const initialState = { id: '', company_prefix: '', name: '', city: '', status: '' };
-  const [newStore, setNewStore] = useState(initialState);
+export default function NewUserModal(props: INewUserModalProps) {
+  const initialState = { company_prefix: '', username: '', email: '', password: '' };
+  const [newUser, setNewUser] = useState(initialState);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setNewStore({ ...newStore, [name]: value });
+    setNewUser({ ...newUser, [name]: value });
   };
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    props.onSubmit(newStore);
+    props.onSubmit(newUser);
     props.toggleRegisterModal();
     props.refreshTable();
-    setNewStore(initialState);
+    setNewUser(initialState);
   };
 
   return (
     <Modal show={props.isOpen} onHide={props.toggleRegisterModal} size='lg'>
       <Form onSubmit={handleSubmit}>
         <Modal.Header className='bg-light'>
-          <Modal.Title>New Store</Modal.Title>
+          <Modal.Title>New User</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Row className='g-3'>
             <Col md={3}>
-              <Form.Select name='company_prefix' value={newStore.company_prefix} onChange={handleInputChange}>
+              <Form.Select name='company_prefix' value={newUser.company_prefix} onChange={handleInputChange}>
                 <option>Company</option>
                 {props.companiesList
                   .sort((a, b) => a.name.localeCompare(b.name))
@@ -56,53 +55,42 @@ export default function NewStoreModal(props: INewStoreModalProps) {
                   ))}
               </Form.Select>
             </Col>
-            <Col md={3}>
+            <Col md={9}>
               <InputGroup className='mb-3'>
-                <InputGroup.Text>ID</InputGroup.Text>
+                <InputGroup.Text>Email</InputGroup.Text>
                 <Form.Control
-                  name='id'
+                  name='email'
                   required={true}
-                  value={newStore.id}
+                  value={newUser.email}
                   onChange={handleInputChange}
-                  placeholder='JH'
-                />
-              </InputGroup>
-            </Col>
-            <Col md={6}>
-              <InputGroup>
-                <InputGroup.Text>City</InputGroup.Text>
-                <Form.Control
-                  name='city'
-                  required={true}
-                  value={newStore.city}
-                  onChange={handleInputChange}
-                  placeholder='Pretoria'
+                  placeholder='gabriel.spada@lanevo.com.br'
                 />
               </InputGroup>
             </Col>
           </Row>
           <Row className='g-3'>
-            <Col md={8}>
+            <Col md={6}>
               <InputGroup>
-                <InputGroup.Text>Name</InputGroup.Text>
+                <InputGroup.Text>Username</InputGroup.Text>
                 <Form.Control
-                  name='name'
+                  name='username'
                   required={true}
-                  value={newStore.name}
+                  value={newUser.username}
                   onChange={handleInputChange}
-                  placeholder='Menlyn'
+                  placeholder='gspada'
                 />
               </InputGroup>
             </Col>
-            <Col md={4}>
+            <Col md={6}>
               <InputGroup>
-                <InputGroup.Text>Status</InputGroup.Text>
+                <InputGroup.Text>Password</InputGroup.Text>
                 <Form.Control
-                  name='status'
+                  name='password'
+                  type='password'
                   required={true}
-                  value={newStore.status}
+                  value={newUser.password}
                   onChange={handleInputChange}
-                  placeholder='Operational'
+                  placeholder='••••••••'
                 />
               </InputGroup>
             </Col>
