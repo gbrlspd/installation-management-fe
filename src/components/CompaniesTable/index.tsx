@@ -14,32 +14,25 @@ export default function CompaniesTable(props: ICompanyTableProps) {
     <Table hover={true} className='mb-0'>
       <thead className='bg-primary text-white'>
         <tr>
-          <th>
+          <th className='d-none d-sm-table-cell'>
             Country
             <i aria-hidden={true} className='fas fa-arrow-down ms-2'></i>
           </th>
-          <th className='text-center'>Prefix</th>
+          <th className='text-center d-none d-sm-table-cell'>Prefix</th>
           <th>Name</th>
-          <th className='text-center'>Stores</th>
-          <th>Updated at</th>
+          <th className='text-center d-none d-sm-table-cell'>Stores</th>
+          <th className='d-none d-sm-table-cell'>Updated at</th>
           <th className='text-center'>Actions</th>
         </tr>
       </thead>
       <tbody>
         {props.companiesList.map((company) => (
           <tr key={company.prefix} className='align-middle'>
-            <td>{company.country}</td>
-            <td className='text-center fw-bold'>{company.prefix}</td>
+            <td className='d-none d-sm-table-cell'>{company.country}</td>
+            <td className='text-center fw-bold d-none d-sm-table-cell'>{company.prefix}</td>
             <td className='fw-bold'>{company.name}</td>
-            <td className='text-center d-flex justify-content-center'>
-              <Alert
-                variant='info'
-                className='px-0 py-1 m-0 d-flex align-items-center justify-content-center'
-                style={{ height: '31px', width: '51px' }}>
-                {company.stores.length}
-              </Alert>
-            </td>
-            <td>{company.updated_at.split('T')[0]}</td>
+            <td className='text-center d-none d-sm-table-cell'>{company.stores.length}</td>
+            <td className='d-none d-sm-table-cell'>{company.updated_at.split('T')[0]}</td>
 
             <td className='text-center'>
               <OverlayTrigger overlay={<Tooltip>Info</Tooltip>}>

@@ -37,7 +37,7 @@ export default function CompanyInfoModal(props: ICompanyInfoModalProps) {
           </Alert>
           <Row className='g-3'>
             <Col md={3}>
-              <InputGroup className='mb-3'>
+              <InputGroup>
                 <InputGroup.Text>Prefix</InputGroup.Text>
                 <Form.Control type='text' value={prefix} readOnly={true} />
               </InputGroup>
@@ -69,7 +69,7 @@ export default function CompanyInfoModal(props: ICompanyInfoModalProps) {
           </InputGroup>
           <Row className='g-3'>
             <Col md={8}>
-              <InputGroup className='mb-3'>
+              <InputGroup>
                 <InputGroup.Text>Validator</InputGroup.Text>
                 <Form.Control
                   type='text'

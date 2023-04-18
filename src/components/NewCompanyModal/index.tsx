@@ -41,7 +41,7 @@ export default function NewCompanyModal(props: INewCompanyModalProps) {
         <Modal.Body>
           <Row className='g-3'>
             <Col md={3}>
-              <InputGroup className='mb-3'>
+              <InputGroup>
                 <InputGroup.Text>Prefix</InputGroup.Text>
                 <Form.Control
                   name='prefix'

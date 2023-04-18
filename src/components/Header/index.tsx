@@ -8,7 +8,7 @@ export default function Header() {
   const router = useRouter();
 
   return (
-    <Navbar className='mb-3' bg='primary' variant='dark'>
+    <Navbar className='navbar mb-3' bg='primary' expand='lg' variant='dark'>
       <Container>
         <Navbar.Brand>
           <i aria-hidden={true} className='fas fa-tools me-2'></i>
