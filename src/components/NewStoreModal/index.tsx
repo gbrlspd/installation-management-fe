@@ -114,7 +114,7 @@ export default function NewStoreModal(props: INewStoreModalProps) {
           </Button>
           <div className='d-grid'>
             <Button variant='info' type='submit' disabled={props.loading}>
-              Save Changes
+              Create
               {props.loading && <Spinner size='sm' className='ms-2'></Spinner>}
             </Button>
           </div>

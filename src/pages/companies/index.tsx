@@ -26,7 +26,7 @@ export default function Companies({ companies, company }: ICompanyPageProps) {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [search, setSearch] = useState('');
   const [companiesList, setCompaniesList] = useState(companies || []);
-  const [selectedCompany, setSelectedCompany] = useState(company);
+  const [selectedCompany, setSelectedCompany] = useState(company || companies[0]);
   const toggleRegisterModal = () => setShowRegisterModal(!showRegisterModal);
   const toggleInfoModal = () => setShowInfoModal(!showInfoModal);
 
@@ -46,17 +46,17 @@ export default function Companies({ companies, company }: ICompanyPageProps) {
     setCompaniesList(res.data.slice().sort((a, b) => a.country.localeCompare(b.country)));
   }
 
-  // async function handleInfoModal(prefix: string) {
-  //   await api
-  //     .get(`/company/${prefix}`)
-  //     .then((res) => {
-  //       setSelectedCompany(res.data);
-  //       setShowInfoModal(true);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // }
+  async function handleInfoClick(prefix: string) {
+    await api
+      .get(`/company/${prefix}`)
+      .then((res) => {
+        setSelectedCompany(res.data);
+        setShowInfoModal(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   async function handleRegister(data: INewCompany) {
     setRegisterLoading(true);
@@ -73,8 +73,8 @@ export default function Companies({ companies, company }: ICompanyPageProps) {
       });
   }
 
-  const handleDeleteClick = (id: string) => {
-    setSelectedCompanyToDelete(id);
+  const handleDeleteClick = (prefix: string) => {
+    setSelectedCompanyToDelete(prefix);
     setShowDeletionModal(true);
   };
 
@@ -116,7 +116,7 @@ export default function Companies({ companies, company }: ICompanyPageProps) {
             <CompaniesTable
               companiesList={companiesList}
               deleteCompany={handleDeleteClick}
-              showCompanyInfo={() => {}}
+              showCompanyInfo={handleInfoClick}
             />
           </Card.Body>
         </Card>
@@ -133,7 +133,7 @@ export default function Companies({ companies, company }: ICompanyPageProps) {
         isOpen={showRegisterModal}
         onSubmit={handleRegister}
       />
-      {/* <CompanyInfoModal isOpen={showInfoModal} toggleInfoModal={toggleInfoModal} company={selectedCompany} /> */}
+      <CompanyInfoModal show={showInfoModal} onClose={toggleInfoModal} company={selectedCompany} />
     </React.Fragment>
   );
 }
