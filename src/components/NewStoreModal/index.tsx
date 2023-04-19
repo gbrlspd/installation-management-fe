@@ -57,7 +57,7 @@ export default function NewStoreModal(props: INewStoreModalProps) {
               </Form.Select>
             </Col>
             <Col md={3}>
-              <InputGroup className='mb-3'>
+              <InputGroup>
                 <InputGroup.Text>ID</InputGroup.Text>
                 <Form.Control
                   name='id'
@@ -69,7 +69,7 @@ export default function NewStoreModal(props: INewStoreModalProps) {
               </InputGroup>
             </Col>
             <Col md={6}>
-              <InputGroup>
+              <InputGroup className='mb-3'>
                 <InputGroup.Text>City</InputGroup.Text>
                 <Form.Control
                   name='city'

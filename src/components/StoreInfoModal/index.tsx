@@ -1,4 +1,5 @@
 import { IStoreProps } from '@/interfaces/store';
+import Link from 'next/link';
 import React from 'react';
 import { Alert, Button, Col, Form, InputGroup, Modal, Row } from 'react-bootstrap';
 
@@ -286,9 +287,11 @@ export default function StoreInfoModal(props: IStoreInfoModalProps) {
             Cancel
           </Button>
           <div className='d-grid'>
-            <Button variant='info' type='submit'>
-              Edit
-            </Button>
+            <Link href={`/stores/${id}`}>
+              <Button variant='info' type='submit'>
+                Edit
+              </Button>
+            </Link>
           </div>
         </Modal.Footer>
       </Form>

@@ -7,6 +7,7 @@ export interface IStoreTableProps {
   storesList: IStoreProps[];
   deleteStore: (id: string) => void;
   showStoreInfo: (id: string) => void;
+  showStoreCredentials: (id: string) => void;
 }
 
 export default function StoresTable(props: IStoreTableProps) {
@@ -55,7 +56,7 @@ export default function StoresTable(props: IStoreTableProps) {
               <Button size='sm' variant='info me-2' onClick={() => props.showStoreInfo(store.id)}>
                 <i aria-hidden={true} className='fas fa-info-circle'></i>
               </Button>
-              <Button size='sm' variant='warning me-2'>
+              <Button size='sm' variant='warning me-2' onClick={() => props.showStoreCredentials(store.id)}>
                 <i aria-hidden={true} className='fas fa-key'></i>
               </Button>
               <Link href={`/stores/${store.id}`}>
