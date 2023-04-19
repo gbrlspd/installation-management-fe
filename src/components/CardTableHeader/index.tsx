@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge, Button, Card, Form, InputGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Badge, Button, Card, Form, InputGroup } from 'react-bootstrap';
 
 export interface ICardTableHeaderProps {
   title: string;
@@ -31,16 +31,12 @@ export default function CardTableHeader(props: ICardTableHeaderProps) {
             placeholder='Search...'
           />
         </InputGroup>
-        <OverlayTrigger overlay={<Tooltip>New</Tooltip>}>
-          <Button variant='success' className='ms-2' onClick={props.toggleRegisterModal}>
-            <i aria-hidden={true} className='fas fa-plus'></i>
-          </Button>
-        </OverlayTrigger>
-        <OverlayTrigger overlay={<Tooltip>Refresh</Tooltip>}>
-          <Button variant='info' className='ms-2' onClick={props.refreshTable}>
-            <i aria-hidden={true} className='fas fa-sync-alt'></i>
-          </Button>
-        </OverlayTrigger>
+        <Button variant='success' className='ms-2' onClick={props.toggleRegisterModal}>
+          <i aria-hidden={true} className='fas fa-plus'></i>
+        </Button>
+        <Button variant='info' className='ms-2' onClick={props.refreshTable}>
+          <i aria-hidden={true} className='fas fa-sync-alt'></i>
+        </Button>
       </Form>
     </Card.Header>
   );

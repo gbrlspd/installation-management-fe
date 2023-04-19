@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
-import { Alert, Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
+import { Button, Table } from 'react-bootstrap';
 import { ICompanyProps } from '@/interfaces/company';
 
 export interface ICompanyTableProps {
@@ -35,23 +35,17 @@ export default function CompaniesTable(props: ICompanyTableProps) {
             <td className='d-none d-sm-table-cell'>{company.updated_at.split('T')[0]}</td>
 
             <td className='text-center'>
-              <OverlayTrigger overlay={<Tooltip>Info</Tooltip>}>
-                <Button size='sm' variant='info me-2' onClick={() => props.showCompanyInfo(company.prefix)}>
-                  <i aria-hidden={true} className='fas fa-info-circle'></i>
+              <Button size='sm' variant='info me-2' onClick={() => props.showCompanyInfo(company.prefix)}>
+                <i aria-hidden={true} className='fas fa-info-circle'></i>
+              </Button>
+              <Link href={`/companies/${company.prefix}`}>
+                <Button size='sm' variant='success' className='me-2'>
+                  <i aria-hidden={true} className='text-white fas fa-wrench'></i>
                 </Button>
-              </OverlayTrigger>
-              <OverlayTrigger overlay={<Tooltip>Manage</Tooltip>}>
-                <Link href={`/companies/${company.prefix}`}>
-                  <Button size='sm' variant='success' className='me-2'>
-                    <i aria-hidden={true} className='text-white fas fa-wrench'></i>
-                  </Button>
-                </Link>
-              </OverlayTrigger>
-              <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                <Button size='sm' variant='danger' onClick={() => props.deleteCompany(company.prefix)}>
-                  <i aria-hidden={true} className='fas fa-trash'></i>
-                </Button>
-              </OverlayTrigger>
+              </Link>
+              <Button size='sm' variant='danger' onClick={() => props.deleteCompany(company.prefix)}>
+                <i aria-hidden={true} className='fas fa-trash'></i>
+              </Button>
             </td>
           </tr>
         ))}
