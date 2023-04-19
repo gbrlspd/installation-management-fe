@@ -11,6 +11,7 @@ import Header from '@/components/Header';
 import UsersTable from '@/components/UsersTable';
 import CardTableHeader from '@/components/CardTableHeader';
 import NewUserModal, { INewUser } from '@/components/NewUserModal';
+import UserManagementModal, { IUserUpdate } from '@/components/UserManagementModal';
 import ConfirmationModal from '@/components/ConfirmationModal';
 
 interface IUserPageProps {
@@ -25,12 +26,16 @@ export default function Users({ users, user, companies }: IUserPageProps) {
   const [registerLoading, setRegisterLoading] = useState(false);
   const [showDeletionModal, setShowDeletionModal] = useState(false);
   const [selectedUserToDelete, setSelectedUserToDelete] = useState('');
+  const [showManagementModal, setShowManagementModal] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [usersList, setUsersList] = useState(users || []);
-  const [selectedUser, setSelectedUser] = useState(user);
-  const toggleRegisterModal = () => setShowRegisterModal(!showRegisterModal);
+  const [selectedUser, setSelectedUser] = useState(user || users[0]);
 
-  const filterBySearch = ({ users, search }) => {
+  const toggleRegisterModal = () => setShowRegisterModal(!showRegisterModal);
+  const toggleManagementModal = () => setShowManagementModal(!showManagementModal);
+
+  function filterBySearch({ users, search }) {
     const tempUsers = users.filter(
       (user) =>
         user.username.toLowerCase().includes(search.toLowerCase()) ||
@@ -39,11 +44,38 @@ export default function Users({ users, user, companies }: IUserPageProps) {
     );
     /* This function sorts an array alphabetically based on the given field */
     setUsersList(tempUsers.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
-  };
+  }
 
   async function handleRefresh() {
     const res = await api.get('/user');
     setUsersList(res.data.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
+  }
+
+  async function handleManagementClick(id: string) {
+    await api
+      .get(`/user/${id}`)
+      .then((res) => {
+        setSelectedUser(res.data);
+        setShowManagementModal(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async function handleUserUpdate(id: string, updateData: IUserUpdate) {
+    setUpdateLoading(true);
+    await api
+      .put(`/user/${id}`, updateData)
+      .then(() => {
+        setShowManagementModal(false);
+        setUpdateLoading(false);
+        handleRefresh();
+      })
+      .catch((err) => {
+        console.log(err);
+        setUpdateLoading(false);
+      });
   }
 
   async function handleRegister(data: INewUser) {
@@ -61,10 +93,14 @@ export default function Users({ users, user, companies }: IUserPageProps) {
       });
   }
 
-  const handleDeleteClick = (id: string) => {
-    setSelectedUserToDelete(id);
-    setShowDeletionModal(true);
-  };
+  function handleDeleteClick(id: string, username: string) {
+    if (username === 'gspada') {
+      console.log('Do not delete my user bro...');
+    } else {
+      setSelectedUserToDelete(id);
+      setShowDeletionModal(true);
+    }
+  }
 
   async function handleConfirmDelete() {
     await api
@@ -101,7 +137,11 @@ export default function Users({ users, user, companies }: IUserPageProps) {
             toggleRegisterModal={toggleRegisterModal}
           />
           <Card.Body className='p-0'>
-            <UsersTable usersList={usersList} deleteUser={handleDeleteClick} />
+            <UsersTable
+              usersList={usersList}
+              deleteUser={handleDeleteClick}
+              showUserManagement={handleManagementClick}
+            />
           </Card.Body>
         </Card>
       </Container>
@@ -109,6 +149,15 @@ export default function Users({ users, user, companies }: IUserPageProps) {
         show={showDeletionModal}
         onClose={() => setShowDeletionModal(false)}
         onConfirm={handleConfirmDelete}
+      />
+      <UserManagementModal
+        loading={updateLoading}
+        companiesList={companiesList}
+        user={selectedUser}
+        show={showManagementModal}
+        onClose={toggleManagementModal}
+        refreshTable={handleRefresh}
+        onSubmit={handleUserUpdate}
       />
       <NewUserModal
         loading={registerLoading}

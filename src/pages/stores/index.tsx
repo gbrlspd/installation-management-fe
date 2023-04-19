@@ -94,8 +94,12 @@ export default function Stores({ stores, store, companies }: IStorePageProps) {
   }
 
   function handleDeleteClick(id: string) {
-    setSelectedStoreToDelete(id);
-    setShowDeletionModal(true);
+    if (id === 'U0') {
+      console.log('Do not delete the U0 store bro...');
+    } else {
+      setSelectedStoreToDelete(id);
+      setShowDeletionModal(true);
+    }
   }
 
   async function handleConfirmDelete() {
