@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import { IStoreProps } from '@/interfaces/store';
-import { Alert, Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
+import { Alert, Button, Table } from 'react-bootstrap';
 
 export interface IStoreTableProps {
   storesList: IStoreProps[];
@@ -52,28 +52,20 @@ export default function StoresTable(props: IStoreTableProps) {
             </td>
             <td className='d-none d-sm-table-cell'>{store.updated_at.split('T')[0]}</td>
             <td className='text-center'>
-              <OverlayTrigger overlay={<Tooltip>Info</Tooltip>}>
-                <Button size='sm' variant='info me-2' onClick={() => props.showStoreInfo(store.id)}>
-                  <i aria-hidden={true} className='fas fa-info-circle'></i>
+              <Button size='sm' variant='info me-2' onClick={() => props.showStoreInfo(store.id)}>
+                <i aria-hidden={true} className='fas fa-info-circle'></i>
+              </Button>
+              <Button size='sm' variant='warning me-2'>
+                <i aria-hidden={true} className='fas fa-key'></i>
+              </Button>
+              <Link href={`/stores/${store.id}`}>
+                <Button size='sm' variant='success' className='me-2'>
+                  <i aria-hidden={true} className='text-white fas fa-wrench'></i>
                 </Button>
-              </OverlayTrigger>
-              <OverlayTrigger overlay={<Tooltip>Credentials</Tooltip>}>
-                <Button size='sm' variant='warning me-2'>
-                  <i aria-hidden={true} className='fas fa-key'></i>
-                </Button>
-              </OverlayTrigger>
-              <OverlayTrigger overlay={<Tooltip>Manage</Tooltip>}>
-                <Link href={`/stores/${store.id}`}>
-                  <Button size='sm' variant='success' className='me-2'>
-                    <i aria-hidden={true} className='text-white fas fa-wrench'></i>
-                  </Button>
-                </Link>
-              </OverlayTrigger>
-              <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                <Button size='sm' variant='danger' onClick={() => props.deleteStore(store.id)}>
-                  <i aria-hidden={true} className='fas fa-trash'></i>
-                </Button>
-              </OverlayTrigger>
+              </Link>
+              <Button size='sm' variant='danger' onClick={() => props.deleteStore(store.id)}>
+                <i aria-hidden={true} className='fas fa-trash'></i>
+              </Button>
             </td>
           </tr>
         ))}

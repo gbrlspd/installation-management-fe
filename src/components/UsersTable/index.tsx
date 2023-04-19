@@ -1,6 +1,6 @@
 import React from 'react';
 import { IUserProps } from '@/interfaces/user';
-import { Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
+import { Button, Table } from 'react-bootstrap';
 
 export interface IUsersTableProps {
   usersList: IUserProps[];
@@ -32,16 +32,12 @@ export default function UsersTable(props: IUsersTableProps) {
             <td className='d-none d-sm-table-cell'>{user.email}</td>
             <td className='d-none d-sm-table-cell'>{user.updated_at.split('T')[0]}</td>
             <td className='text-center'>
-              <OverlayTrigger overlay={<Tooltip>Edit</Tooltip>}>
-                <Button size='sm' variant='success' className='me-2'>
-                  <i aria-hidden={true} className='text-white fas fa-wrench'></i>
-                </Button>
-              </OverlayTrigger>
-              <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                <Button size='sm' variant='danger' onClick={() => props.deleteUser(user.id)}>
-                  <i aria-hidden={true} className='fas fa-trash'></i>
-                </Button>
-              </OverlayTrigger>
+              <Button size='sm' variant='success' className='me-2'>
+                <i aria-hidden={true} className='text-white fas fa-wrench'></i>
+              </Button>
+              <Button size='sm' variant='danger' onClick={() => props.deleteUser(user.id)}>
+                <i aria-hidden={true} className='fas fa-trash'></i>
+              </Button>
             </td>
           </tr>
         ))}
