@@ -13,6 +13,7 @@ import CardTableHeader from '@/components/CardTableHeader';
 import NewStoreModal, { INewStore } from '@/components/NewStoreModal';
 import ConfirmationModal from '@/components/ConfirmationModal';
 import StoreInfoModal from '@/components/StoreInfoModal';
+import StoreCredentialsModal from '@/components/StoreCredentialsModal';
 
 export interface IStorePageProps {
   store: IStoreProps;
@@ -22,18 +23,22 @@ export interface IStorePageProps {
 
 export default function Stores({ stores, store, companies }: IStorePageProps) {
   const companiesList = companies;
+
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [registerLoading, setRegisterLoading] = useState(false);
   const [showDeletionModal, setShowDeletionModal] = useState(false);
   const [selectedStoreToDelete, setSelectedStoreToDelete] = useState('');
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showCredentialsModal, setShowCredentialsModal] = useState(false);
   const [search, setSearch] = useState('');
   const [storesList, setStoresList] = useState(stores || []);
   const [selectedStore, setSelectedStore] = useState(store || stores[0]);
+
   const toggleRegisterModal = () => setShowRegisterModal(!showRegisterModal);
   const toggleInfoModal = () => setShowInfoModal(!showInfoModal);
+  const toggleCredentialsModal = () => setShowCredentialsModal(!showCredentialsModal);
 
-  const filterBySearch = ({ stores, search }) => {
+  function filterBySearch({ stores, search }) {
     const tempStores = stores.filter(
       (store) =>
         store.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -42,7 +47,7 @@ export default function Stores({ stores, store, companies }: IStorePageProps) {
     );
     /* This function sorts an array alphabetically based on the given field */
     setStoresList(tempStores.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
-  };
+  }
 
   async function handleRefresh() {
     const res = await api.get('/store');
@@ -55,6 +60,18 @@ export default function Stores({ stores, store, companies }: IStorePageProps) {
       .then((res) => {
         setSelectedStore(res.data);
         setShowInfoModal(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async function handleCredentialsClick(id: string) {
+    await api
+      .get(`/store/${id}`)
+      .then((res) => {
+        setSelectedStore(res.data);
+        setShowCredentialsModal(true);
       })
       .catch((err) => {
         console.log(err);
@@ -76,10 +93,10 @@ export default function Stores({ stores, store, companies }: IStorePageProps) {
       });
   }
 
-  const handleDeleteClick = (id: string) => {
+  function handleDeleteClick(id: string) {
     setSelectedStoreToDelete(id);
     setShowDeletionModal(true);
-  };
+  }
 
   async function handleConfirmDelete() {
     await api
@@ -116,7 +133,12 @@ export default function Stores({ stores, store, companies }: IStorePageProps) {
             toggleRegisterModal={toggleRegisterModal}
           />
           <Card.Body className='p-0'>
-            <StoresTable storesList={storesList} deleteStore={handleDeleteClick} showStoreInfo={handleInfoClick} />
+            <StoresTable
+              storesList={storesList}
+              deleteStore={handleDeleteClick}
+              showStoreInfo={handleInfoClick}
+              showStoreCredentials={handleCredentialsClick}
+            />
           </Card.Body>
         </Card>
       </Container>
@@ -134,6 +156,7 @@ export default function Stores({ stores, store, companies }: IStorePageProps) {
         onSubmit={handleRegister}
       />
       <StoreInfoModal show={showInfoModal} onClose={toggleInfoModal} store={selectedStore} />
+      <StoreCredentialsModal show={showCredentialsModal} onClose={toggleCredentialsModal} store={selectedStore} />
     </React.Fragment>
   );
 }
