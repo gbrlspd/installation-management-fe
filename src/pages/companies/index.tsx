@@ -1,64 +1,99 @@
 import Head from 'next/head';
-import React, { FormEvent, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
-import {
-  Badge,
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Modal,
-  OverlayTrigger,
-  Row,
-  Spinner,
-  Tooltip,
-} from 'react-bootstrap';
-
+import { Card, Container } from 'react-bootstrap';
+import { ICompanyProps } from '@/interfaces/company';
 import { authenticatedPage } from '@/authentication/authenticatedPage';
-import Header from '@/components/Header';
 import { api } from '@/services/apiClient';
 import { apiConfiguration } from '@/services/api';
+import Header from '@/components/Header';
 import CompaniesTable from '@/components/CompaniesTable';
+import CardTableHeader from '@/components/CardTableHeader';
+import NewCompanyModal, { INewCompany } from '@/components/NewCompanyModal';
+import CompanyInfoModal from '@/components/CompanyInfoModal';
+import ConfirmationModal from '@/components/ConfirmationModal';
 
-interface CompanyProps {
-  prefix: string;
-  name: string;
-  country: string;
-  updated_at: string;
+interface ICompanyPageProps {
+  company: ICompanyProps;
+  companies: ICompanyProps[];
 }
 
-interface CompaniesProps {
-  companies: CompanyProps[];
-}
+export default function Companies({ companies, company }: ICompanyPageProps) {
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [registerLoading, setRegisterLoading] = useState(false);
+  const [showDeletionModal, setShowDeletionModal] = useState(false);
+  const [selectedCompanyToDelete, setSelectedCompanyToDelete] = useState('');
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [search, setSearch] = useState('');
+  const [companiesList, setCompaniesList] = useState(companies || []);
+  const [selectedCompany, setSelectedCompany] = useState(company || companies[0]);
+  const toggleRegisterModal = () => setShowRegisterModal(!showRegisterModal);
+  const toggleInfoModal = () => setShowInfoModal(!showInfoModal);
 
-export default function Companies({ companies }: CompaniesProps) {
-  const initialState = { prefix: '', name: '', country: '' };
-  const [show, setShow] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [newCompany, setNewCompany] = useState(initialState);
-  const [companiesList, setCompaniesList] = useState(
+  const filterBySearch = ({ companies, search }) => {
+    const tempCompanies = companies.filter(
+      (company) =>
+        company.name.toLowerCase().includes(search.toLowerCase()) ||
+        company.prefix.toLowerCase().includes(search.toLowerCase()) ||
+        company.country.toLowerCase().includes(search.toLowerCase())
+    );
     /* This function sorts an array alphabetically based on the given field */
-    companies.slice().sort((a, b) => a.country.localeCompare(b.country)) || []
-  );
-
-  const toggleModal = () => setShow(!show);
-
-  async function handleRegister(event: FormEvent) {
-    setLoading(true);
-    event.preventDefault();
-    await api.post('/company', newCompany);
-    toggleModal();
-    setLoading(false);
-    setNewCompany(initialState);
-    handleRefresh();
-  }
+    setCompaniesList(tempCompanies.slice().sort((a, b) => a.country.localeCompare(b.country)));
+  };
 
   async function handleRefresh() {
     const res = await api.get('/company');
     setCompaniesList(res.data.slice().sort((a, b) => a.country.localeCompare(b.country)));
   }
+
+  async function handleInfoClick(prefix: string) {
+    await api
+      .get(`/company/${prefix}`)
+      .then((res) => {
+        setSelectedCompany(res.data);
+        setShowInfoModal(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async function handleRegister(data: INewCompany) {
+    setRegisterLoading(true);
+    await api
+      .post('/company', data)
+      .then(() => {
+        setShowRegisterModal(false);
+        setRegisterLoading(false);
+        handleRefresh();
+      })
+      .catch((err) => {
+        console.log(err);
+        setRegisterLoading(false);
+      });
+  }
+
+  const handleDeleteClick = (prefix: string) => {
+    setSelectedCompanyToDelete(prefix);
+    setShowDeletionModal(true);
+  };
+
+  async function handleConfirmDelete() {
+    await api
+      .delete(`/company/${selectedCompanyToDelete}`)
+      .then(() => {
+        handleRefresh();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    setSelectedCompanyToDelete('');
+    setShowDeletionModal(false);
+  }
+
+  useEffect(() => {
+    filterBySearch({ companies, search });
+  }, [companies, search]);
 
   return (
     <React.Fragment>
@@ -68,93 +103,37 @@ export default function Companies({ companies }: CompaniesProps) {
       <Header />
       <Container>
         <Card>
-          <Card.Header>
-            <Card.Title className='mt-2 mb-3 d-flex align-items-center'>
-              Companies
-              <i aria-hidden={true} className='fas fa-landmark ms-2'></i>
-              <Badge className='ms-2 fw-normal bg-info'>{companiesList.length}</Badge>
-            </Card.Title>
-            <Form className='d-flex mb-2'>
-              <InputGroup>
-                <InputGroup.Text>
-                  <i aria-hidden={true} className='fas fa-search'></i>
-                </InputGroup.Text>
-                <Form.Control type='text' placeholder='Search...' />
-              </InputGroup>
-              <OverlayTrigger overlay={<Tooltip>New</Tooltip>}>
-                <Button variant='success' className='ms-2' onClick={toggleModal}>
-                  <i aria-hidden={true} className='fas fa-plus'></i>
-                </Button>
-              </OverlayTrigger>
-              <OverlayTrigger overlay={<Tooltip>Refresh</Tooltip>}>
-                <Button variant='info' className='ms-2' onClick={handleRefresh}>
-                  <i aria-hidden={true} className='fas fa-sync-alt'></i>
-                </Button>
-              </OverlayTrigger>
-            </Form>
-          </Card.Header>
+          <CardTableHeader
+            title='Companies'
+            faIcon='fa-landmark'
+            itemQty={companiesList.length}
+            search={search}
+            handleChangeSearch={(search) => setSearch(search)}
+            refreshTable={handleRefresh}
+            toggleRegisterModal={toggleRegisterModal}
+          />
           <Card.Body className='p-0'>
-            <CompaniesTable companiesList={companiesList} />
+            <CompaniesTable
+              companiesList={companiesList}
+              deleteCompany={handleDeleteClick}
+              showCompanyInfo={handleInfoClick}
+            />
           </Card.Body>
         </Card>
       </Container>
-
-      <Modal show={show} onHide={toggleModal} size='lg'>
-        <Form onSubmit={handleRegister}>
-          <Modal.Header className='bg-light'>
-            <Modal.Title>New Company</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Row className='g-3'>
-              <Col md={3}>
-                <InputGroup className='mb-3'>
-                  <InputGroup.Text>Prefix</InputGroup.Text>
-                  <Form.Control
-                    type='text'
-                    required={true}
-                    value={newCompany.prefix}
-                    onChange={(e) => setNewCompany({ ...newCompany, prefix: e.target.value })}
-                    placeholder='I4'
-                  />
-                </InputGroup>
-              </Col>
-              <Col md={9}>
-                <InputGroup className='mb-3'>
-                  <InputGroup.Text>Country</InputGroup.Text>
-                  <Form.Control
-                    type='text'
-                    required={true}
-                    value={newCompany.country}
-                    onChange={(e) => setNewCompany({ ...newCompany, country: e.target.value })}
-                    placeholder='South Africa'
-                  />
-                </InputGroup>
-              </Col>
-            </Row>
-            <InputGroup>
-              <InputGroup.Text>Name</InputGroup.Text>
-              <Form.Control
-                type='text'
-                required={true}
-                value={newCompany.name}
-                onChange={(e) => setNewCompany({ ...newCompany, name: e.target.value })}
-                placeholder='Fun Company'
-              />
-            </InputGroup>
-          </Modal.Body>
-          <Modal.Footer className='bg-light'>
-            <Button variant='danger' onClick={toggleModal}>
-              Cancel
-            </Button>
-            <div className='d-grid'>
-              <Button variant='info' type='submit' disabled={loading}>
-                Save Changes
-                {loading && <Spinner size='sm' className='ms-2'></Spinner>}
-              </Button>
-            </div>
-          </Modal.Footer>
-        </Form>
-      </Modal>
+      <ConfirmationModal
+        show={showDeletionModal}
+        onClose={() => setShowDeletionModal(false)}
+        onConfirm={handleConfirmDelete}
+      />
+      <NewCompanyModal
+        loading={registerLoading}
+        refreshTable={handleRefresh}
+        toggleRegisterModal={toggleRegisterModal}
+        isOpen={showRegisterModal}
+        onSubmit={handleRegister}
+      />
+      <CompanyInfoModal show={showInfoModal} onClose={toggleInfoModal} company={selectedCompany} />
     </React.Fragment>
   );
 }

@@ -1,66 +1,87 @@
 import Head from 'next/head';
-import React, { FormEvent, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
+import { Button, Card, Container, Modal } from 'react-bootstrap';
+import { IUserProps } from '@/interfaces/user';
+import { ICompanyProps } from '@/interfaces/company';
 import { authenticatedPage } from '@/authentication/authenticatedPage';
-import Header from '@/components/Header';
-import {
-  Badge,
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Modal,
-  OverlayTrigger,
-  Row,
-  Spinner,
-  Tooltip,
-} from 'react-bootstrap';
-import { apiConfiguration } from '@/services/api';
 import { api } from '@/services/apiClient';
+import { apiConfiguration } from '@/services/api';
+import Header from '@/components/Header';
 import UsersTable from '@/components/UsersTable';
+import CardTableHeader from '@/components/CardTableHeader';
+import NewUserModal, { INewUser } from '@/components/NewUserModal';
+import ConfirmationModal from '@/components/ConfirmationModal';
 
-interface UserProps {
-  company: {
-    name: string;
-  };
-  id: string;
-  username: string;
-  email: string;
-  updated_at: string;
+interface IUserPageProps {
+  user: IUserProps;
+  users: IUserProps[];
+  companies: ICompanyProps[];
 }
 
-interface UsersProps {
-  users: UserProps[];
-}
+export default function Users({ users, user, companies }: IUserPageProps) {
+  const companiesList = companies;
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [registerLoading, setRegisterLoading] = useState(false);
+  const [showDeletionModal, setShowDeletionModal] = useState(false);
+  const [selectedUserToDelete, setSelectedUserToDelete] = useState('');
+  const [search, setSearch] = useState('');
+  const [usersList, setUsersList] = useState(users || []);
+  const [selectedUser, setSelectedUser] = useState(user);
+  const toggleRegisterModal = () => setShowRegisterModal(!showRegisterModal);
 
-export default function Users({ users }: UsersProps) {
-  const initialState = { company_prefix: '', username: '', email: '', password: '' };
-  const [show, setShow] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [newUser, setNewUser] = useState(initialState);
-  const [usersList, setUsersList] = useState(
+  const filterBySearch = ({ users, search }) => {
+    const tempUsers = users.filter(
+      (user) =>
+        user.username.toLowerCase().includes(search.toLowerCase()) ||
+        user.email.toLowerCase().includes(search.toLowerCase()) ||
+        user.company.name.toLowerCase().includes(search.toLowerCase())
+    );
     /* This function sorts an array alphabetically based on the given field */
-    users.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)) || []
-  );
-
-  const toggleModal = () => setShow(!show);
-
-  async function handleRegister(event: FormEvent) {
-    setLoading(true);
-    event.preventDefault();
-    await api.post('/user', newUser);
-    toggleModal();
-    setLoading(false);
-    setNewUser(initialState);
-    handleRefresh();
-  }
+    setUsersList(tempUsers.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
+  };
 
   async function handleRefresh() {
     const res = await api.get('/user');
     setUsersList(res.data.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
   }
+
+  async function handleRegister(data: INewUser) {
+    setRegisterLoading(true);
+    await api
+      .post('/user', data)
+      .then(() => {
+        setShowRegisterModal(false);
+        setRegisterLoading(false);
+        handleRefresh();
+      })
+      .catch((err) => {
+        console.log(err);
+        setRegisterLoading(false);
+      });
+  }
+
+  const handleDeleteClick = (id: string) => {
+    setSelectedUserToDelete(id);
+    setShowDeletionModal(true);
+  };
+
+  async function handleConfirmDelete() {
+    await api
+      .delete(`/user/${selectedUserToDelete}`)
+      .then(() => {
+        handleRefresh();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    setSelectedUserToDelete('');
+    setShowDeletionModal(false);
+  }
+
+  useEffect(() => {
+    filterBySearch({ users, search });
+  }, [users, search]);
 
   return (
     <React.Fragment>
@@ -70,117 +91,46 @@ export default function Users({ users }: UsersProps) {
       <Header />
       <Container>
         <Card>
-          <Card.Header>
-            <Card.Title className='mt-2 mb-3 d-flex align-items-center'>
-              Users
-              <i aria-hidden={true} className='fas fa-user-friends ms-2'></i>
-              <Badge className='ms-2 fw-normal bg-info'>{usersList.length}</Badge>
-            </Card.Title>
-            <Form className='d-flex mb-2'>
-              <InputGroup>
-                <InputGroup.Text>
-                  <i aria-hidden={true} className='fas fa-search'></i>
-                </InputGroup.Text>
-                <Form.Control type='text' placeholder='Search...' />
-              </InputGroup>
-              <OverlayTrigger overlay={<Tooltip>New</Tooltip>}>
-                <Button variant='success' className='ms-2' onClick={toggleModal}>
-                  <i aria-hidden={true} className='fas fa-plus'></i>
-                </Button>
-              </OverlayTrigger>
-              <OverlayTrigger overlay={<Tooltip>Refresh</Tooltip>}>
-                <Button variant='info' className='ms-2' onClick={handleRefresh}>
-                  <i aria-hidden={true} className='fas fa-sync-alt'></i>
-                </Button>
-              </OverlayTrigger>
-            </Form>
-          </Card.Header>
+          <CardTableHeader
+            title='Users'
+            faIcon='fa-user-friends'
+            itemQty={usersList.length}
+            search={search}
+            handleChangeSearch={(search) => setSearch(search)}
+            refreshTable={handleRefresh}
+            toggleRegisterModal={toggleRegisterModal}
+          />
           <Card.Body className='p-0'>
-            <UsersTable usersList={usersList} />
+            <UsersTable usersList={usersList} deleteUser={handleDeleteClick} />
           </Card.Body>
         </Card>
       </Container>
-
-      <Modal show={show} onHide={toggleModal} size='lg'>
-        <Form onSubmit={handleRegister}>
-          <Modal.Header className='bg-light'>
-            <Modal.Title>New User</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Row className='g-3'>
-              <Col md={3}>
-                <InputGroup className='mb-3'>
-                  <InputGroup.Text>Prefix</InputGroup.Text>
-                  <Form.Control
-                    required={true}
-                    value={newUser.company_prefix}
-                    onChange={(e) => setNewUser({ ...newUser, company_prefix: e.target.value })}
-                    placeholder='U0'
-                  />
-                </InputGroup>
-              </Col>
-              <Col md={9}>
-                <InputGroup className='mb-3'>
-                  <InputGroup.Text>Email</InputGroup.Text>
-                  <Form.Control
-                    required={true}
-                    value={newUser.email}
-                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                    placeholder='gabriel.spada@lanevo.com.br'
-                  />
-                </InputGroup>
-              </Col>
-            </Row>
-            <Row className='g-3'>
-              <Col md={6}>
-                <InputGroup>
-                  <InputGroup.Text>Username</InputGroup.Text>
-                  <Form.Control
-                    required={true}
-                    value={newUser.username}
-                    onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
-                    placeholder='gspada'
-                  />
-                </InputGroup>
-              </Col>
-              <Col md={6}>
-                <InputGroup>
-                  <InputGroup.Text>Password</InputGroup.Text>
-                  <Form.Control
-                    required={true}
-                    value={newUser.password}
-                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                    type='password'
-                    placeholder='••••••••'
-                  />
-                </InputGroup>
-              </Col>
-            </Row>
-          </Modal.Body>
-          <Modal.Footer className='bg-light'>
-            <Button variant='danger' onClick={toggleModal}>
-              Cancel
-            </Button>
-            <div className='d-grid'>
-              <Button variant='info' type='submit' disabled={loading}>
-                Save Changes
-                {loading && <Spinner size='sm' className='ms-2'></Spinner>}
-              </Button>
-            </div>
-          </Modal.Footer>
-        </Form>
-      </Modal>
+      <ConfirmationModal
+        show={showDeletionModal}
+        onClose={() => setShowDeletionModal(false)}
+        onConfirm={handleConfirmDelete}
+      />
+      <NewUserModal
+        loading={registerLoading}
+        companiesList={companiesList}
+        refreshTable={handleRefresh}
+        toggleRegisterModal={toggleRegisterModal}
+        isOpen={showRegisterModal}
+        onSubmit={handleRegister}
+      />
     </React.Fragment>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = authenticatedPage(async (ctx) => {
   const api = apiConfiguration(ctx);
-  const res = await api.get('/user');
+  const usersRes = await api.get('/user');
+  const companiesRes = await api.get('/company');
 
   return {
     props: {
-      users: res.data,
+      users: usersRes.data,
+      companies: companiesRes.data,
     },
   };
 });

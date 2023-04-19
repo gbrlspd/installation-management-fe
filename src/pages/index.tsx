@@ -28,11 +28,11 @@ export default function Home() {
         <meta name='viewport' content='width=device-width, initial-scale=1' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <Container className='vh-100 align-items-center d-flex justify-content-md-center'>
+      <Container className='vh-100 align-items-center d-flex justify-content-center'>
         <Row>
           <Col>
             <Card>
-              <Card.Header>
+              <Card.Header className='d-none d-sm-block'>
                 <Image
                   className='m-4'
                   src={logo}

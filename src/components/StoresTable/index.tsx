@@ -1,8 +1,15 @@
 import Link from 'next/link';
 import React from 'react';
+import { IStoreProps } from '@/interfaces/store';
 import { Alert, Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
 
-export default function StoresTable({ storesList }) {
+export interface IStoreTableProps {
+  storesList: IStoreProps[];
+  deleteStore: (id: string) => void;
+  showStoreInfo: (id: string) => void;
+}
+
+export default function StoresTable(props: IStoreTableProps) {
   const validateStatus = (status) => {
     switch (status) {
       case 'Operational':
@@ -16,39 +23,37 @@ export default function StoresTable({ storesList }) {
     <Table hover={true} className='mb-0'>
       <thead className='bg-primary text-white'>
         <tr>
-          <th>
+          <th className='d-none d-sm-table-cell'>
             Company
             <i aria-hidden={true} className='fas fa-arrow-down ms-2'></i>
           </th>
-          <th className='text-center'>ID</th>
+          <th className='text-center d-none d-sm-table-cell'>ID</th>
           <th>Name</th>
-          <th>City</th>
-          <th className='text-center'>Status</th>
-          <th>Updated at</th>
+          <th className='d-none d-sm-table-cell'>City</th>
+          <th className='text-center d-none d-sm-table-cell'>Status</th>
+          <th className='d-none d-sm-table-cell'>Updated at</th>
           <th className='text-center'>Actions</th>
         </tr>
       </thead>
       <tbody>
-        {storesList.map((store) => (
+        {props.storesList.map((store) => (
           <tr key={store.id} className='align-middle'>
-            <td>{store.company.name}</td>
-            <td className='text-center fw-bold'>{store.id}</td>
-            <td className='fw-bold'>{store.name}</td>
-            <td>{store.city}</td>
-            <td className='text-center d-flex justify-content-center'>
+            <td className='d-none d-sm-table-cell'>{store.company.name}</td>
+            <td className='text-center d-none d-sm-table-cell'>{store.id}</td>
+            <td>{store.name}</td>
+            <td className='d-none d-sm-table-cell'>{store.city}</td>
+            <td className='text-center d-flex justify-content-center d-none d-sm-flex'>
               <Alert
                 variant={validateStatus(store.status)}
                 className='px-2 py-1 m-0 d-flex align-items-center justify-content-center'
-                style={{ height: '31px' }}
-              >
+                style={{ height: '31px' }}>
                 {store.status}
               </Alert>
             </td>
-            <td>{store.updated_at.split('T')[0]}</td>
-
+            <td className='d-none d-sm-table-cell'>{store.updated_at.split('T')[0]}</td>
             <td className='text-center'>
               <OverlayTrigger overlay={<Tooltip>Info</Tooltip>}>
-                <Button size='sm' variant='info me-2'>
+                <Button size='sm' variant='info me-2' onClick={() => props.showStoreInfo(store.id)}>
                   <i aria-hidden={true} className='fas fa-info-circle'></i>
                 </Button>
               </OverlayTrigger>
@@ -65,7 +70,7 @@ export default function StoresTable({ storesList }) {
                 </Link>
               </OverlayTrigger>
               <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                <Button size='sm' variant='danger'>
+                <Button size='sm' variant='danger' onClick={() => props.deleteStore(store.id)}>
                   <i aria-hidden={true} className='fas fa-trash'></i>
                 </Button>
               </OverlayTrigger>

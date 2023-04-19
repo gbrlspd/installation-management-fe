@@ -1,33 +1,42 @@
 import Link from 'next/link';
 import React from 'react';
-import { Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
+import { Alert, Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
+import { ICompanyProps } from '@/interfaces/company';
 
-export default function CompaniesTable({ companiesList }) {
+export interface ICompanyTableProps {
+  companiesList: ICompanyProps[];
+  deleteCompany: (prefix: string) => void;
+  showCompanyInfo: (prefix: string) => void;
+}
+
+export default function CompaniesTable(props: ICompanyTableProps) {
   return (
     <Table hover={true} className='mb-0'>
       <thead className='bg-primary text-white'>
         <tr>
-          <th>
+          <th className='d-none d-sm-table-cell'>
             Country
             <i aria-hidden={true} className='fas fa-arrow-down ms-2'></i>
           </th>
-          <th className='text-center'>Prefix</th>
+          <th className='text-center d-none d-sm-table-cell'>Prefix</th>
           <th>Name</th>
-          <th>Updated at</th>
+          <th className='text-center d-none d-sm-table-cell'>Stores</th>
+          <th className='d-none d-sm-table-cell'>Updated at</th>
           <th className='text-center'>Actions</th>
         </tr>
       </thead>
       <tbody>
-        {companiesList.map((company) => (
+        {props.companiesList.map((company) => (
           <tr key={company.prefix} className='align-middle'>
-            <td>{company.country}</td>
-            <td className='text-center fw-bold'>{company.prefix}</td>
-            <td className='fw-bold'>{company.name}</td>
-            <td>{company.updated_at.split('T')[0]}</td>
+            <td className='d-none d-sm-table-cell'>{company.country}</td>
+            <td className='text-center d-none d-sm-table-cell'>{company.prefix}</td>
+            <td>{company.name}</td>
+            <td className='text-center d-none d-sm-table-cell'>{company.stores.length}</td>
+            <td className='d-none d-sm-table-cell'>{company.updated_at.split('T')[0]}</td>
 
             <td className='text-center'>
               <OverlayTrigger overlay={<Tooltip>Info</Tooltip>}>
-                <Button size='sm' variant='info me-2'>
+                <Button size='sm' variant='info me-2' onClick={() => props.showCompanyInfo(company.prefix)}>
                   <i aria-hidden={true} className='fas fa-info-circle'></i>
                 </Button>
               </OverlayTrigger>
@@ -39,7 +48,7 @@ export default function CompaniesTable({ companiesList }) {
                 </Link>
               </OverlayTrigger>
               <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                <Button size='sm' variant='danger'>
+                <Button size='sm' variant='danger' onClick={() => props.deleteCompany(company.prefix)}>
                   <i aria-hidden={true} className='fas fa-trash'></i>
                 </Button>
               </OverlayTrigger>
