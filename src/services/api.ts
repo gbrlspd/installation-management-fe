@@ -7,7 +7,7 @@ export function apiConfiguration(ctx = undefined) {
   let cookies = parseCookies(ctx);
 
   const api = axios.create({
-    baseURL: 'http://localhost:3000',
+    baseURL: process.env.API_URL,
     headers: {
       Authorization: `Bearer ${cookies['@installationmanagement.token']}`,
     },
