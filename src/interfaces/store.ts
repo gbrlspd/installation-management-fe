@@ -40,3 +40,11 @@ export interface IStoreProps {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface INewStore {
+  id: string;
+  company_prefix: string;
+  name: string;
+  city: string;
+  status: string;
+}

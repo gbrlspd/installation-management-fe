@@ -1,48 +1,46 @@
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
-import { Button, Card, Container, Modal } from 'react-bootstrap';
-import { IUserProps } from '@/interfaces/user';
-import { ICompanyProps } from '@/interfaces/company';
-import { authenticatedPage } from '@/authentication/authenticatedPage';
+import { Card, Container } from 'react-bootstrap';
+
 import { api } from '@/services/apiClient';
 import { apiConfiguration } from '@/services/api';
-import Header from '@/components/Header';
-import UsersTable from '@/components/UsersTable';
-import CardTableHeader from '@/components/CardTableHeader';
-import NewUserModal, { INewUser } from '@/components/NewUserModal';
-import UserManagementModal, { IUserUpdate } from '@/components/UserManagementModal';
-import ConfirmationModal from '@/components/ConfirmationModal';
+import { authenticatedPage } from '@/authentication/authenticatedPage';
 
-interface IUserPageProps {
+import { INewUser, IUserProps, IUserUpdate } from '@/interfaces/user';
+import { ICompanyProps } from '@/interfaces/company';
+import Header from '@/components/Header';
+import CardTableHeader from '@/components/CardTableHeader';
+import UsersTable from '@/components/UsersTable';
+import NewUserModal from '@/components/NewUserModal';
+import UserManagementModal from '@/components/UserManagementModal';
+import DeleteModal from '@/components/DeleteModal';
+
+interface IUsersPageProps {
   user: IUserProps;
   users: IUserProps[];
   companies: ICompanyProps[];
 }
 
-export default function Users({ users, user, companies }: IUserPageProps) {
+export default function Users({ users, user, companies }: IUsersPageProps) {
   const companiesList = companies;
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [registerLoading, setRegisterLoading] = useState(false);
-  const [showDeletionModal, setShowDeletionModal] = useState(false);
-  const [selectedUserToDelete, setSelectedUserToDelete] = useState('');
-  const [showManagementModal, setShowManagementModal] = useState(false);
-  const [updateLoading, setUpdateLoading] = useState(false);
-  const [search, setSearch] = useState('');
   const [usersList, setUsersList] = useState(users || []);
+  const [search, setSearch] = useState('');
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showManagementModal, setShowManagementModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [registerLoading, setRegisterLoading] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState(user || users[0]);
+  const [selectedUserToDelete, setSelectedUserToDelete] = useState('');
 
-  const toggleRegisterModal = () => setShowRegisterModal(!showRegisterModal);
-  const toggleManagementModal = () => setShowManagementModal(!showManagementModal);
-
-  function filterBySearch({ users, search }) {
+  function handleSearchChange({ users, search }: { users: IUserProps[]; search: string }) {
     const tempUsers = users.filter(
       (user) =>
         user.username.toLowerCase().includes(search.toLowerCase()) ||
         user.email.toLowerCase().includes(search.toLowerCase()) ||
         user.company.name.toLowerCase().includes(search.toLowerCase())
     );
-    /* This function sorts an array alphabetically based on the given field */
     setUsersList(tempUsers.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
   }
 
@@ -51,34 +49,7 @@ export default function Users({ users, user, companies }: IUserPageProps) {
     setUsersList(res.data.slice().sort((a, b) => a.company.name.localeCompare(b.company.name)));
   }
 
-  async function handleManagementClick(id: string) {
-    await api
-      .get(`/user/${id}`)
-      .then((res) => {
-        setSelectedUser(res.data);
-        setShowManagementModal(true);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
-  async function handleUserUpdate(id: string, updateData: IUserUpdate) {
-    setUpdateLoading(true);
-    await api
-      .put(`/user/${id}`, updateData)
-      .then(() => {
-        setShowManagementModal(false);
-        setUpdateLoading(false);
-        handleRefresh();
-      })
-      .catch((err) => {
-        console.log(err);
-        setUpdateLoading(false);
-      });
-  }
-
-  async function handleRegister(data: INewUser) {
+  async function handleRegisterUser(data: INewUser) {
     setRegisterLoading(true);
     await api
       .post('/user', data)
@@ -93,12 +64,39 @@ export default function Users({ users, user, companies }: IUserPageProps) {
       });
   }
 
-  function handleDeleteClick(id: string, username: string) {
+  async function handleUserManagementClick(id: string) {
+    await api
+      .get(`/user/${id}`)
+      .then((res) => {
+        setSelectedUser(res.data);
+        setShowManagementModal(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async function handleUpdateUser(id: string, updateData: IUserUpdate) {
+    setUpdateLoading(true);
+    await api
+      .put(`/user/${id}`, updateData)
+      .then(() => {
+        setShowManagementModal(false);
+        setUpdateLoading(false);
+        handleRefresh();
+      })
+      .catch((err) => {
+        console.log(err);
+        setUpdateLoading(false);
+      });
+  }
+
+  function handleDeleteUserClick(id: string, username: string) {
     if (username === 'gspada') {
       console.log('Do not delete my user bro...');
     } else {
       setSelectedUserToDelete(id);
-      setShowDeletionModal(true);
+      setShowDeleteModal(true);
     }
   }
 
@@ -112,11 +110,11 @@ export default function Users({ users, user, companies }: IUserPageProps) {
         console.log(err);
       });
     setSelectedUserToDelete('');
-    setShowDeletionModal(false);
+    setShowDeleteModal(false);
   }
 
   useEffect(() => {
-    filterBySearch({ users, search });
+    handleSearchChange({ users, search });
   }, [users, search]);
 
   return (
@@ -129,57 +127,53 @@ export default function Users({ users, user, companies }: IUserPageProps) {
         <Card>
           <CardTableHeader
             title='Users'
-            faIcon='fa-user-friends'
-            itemQty={usersList.length}
-            search={search}
-            handleChangeSearch={(search) => setSearch(search)}
-            refreshTable={handleRefresh}
-            toggleRegisterModal={toggleRegisterModal}
+            icon='fa-user-friends'
+            totalItems={usersList.length}
+            searchValue={search}
+            onSearchChange={(search) => setSearch(search)}
+            onRefresh={handleRefresh}
+            onRegisterClick={() => setShowRegisterModal(true)}
           />
           <Card.Body className='p-0'>
             <UsersTable
               usersList={usersList}
-              deleteUser={handleDeleteClick}
-              showUserManagement={handleManagementClick}
+              onUserManagementClick={handleUserManagementClick}
+              onDeleteUserClick={handleDeleteUserClick}
             />
           </Card.Body>
         </Card>
       </Container>
-      <ConfirmationModal
-        show={showDeletionModal}
-        onClose={() => setShowDeletionModal(false)}
-        onConfirm={handleConfirmDelete}
+      <NewUserModal
+        companiesList={companiesList}
+        show={showRegisterModal}
+        loading={registerLoading}
+        onSubmit={handleRegisterUser}
+        onRefresh={handleRefresh}
+        onClose={() => setShowRegisterModal(false)}
       />
       <UserManagementModal
-        loading={updateLoading}
-        companiesList={companiesList}
         user={selectedUser}
-        show={showManagementModal}
-        onClose={toggleManagementModal}
-        refreshTable={handleRefresh}
-        onSubmit={handleUserUpdate}
-      />
-      <NewUserModal
-        loading={registerLoading}
         companiesList={companiesList}
-        refreshTable={handleRefresh}
-        toggleRegisterModal={toggleRegisterModal}
-        isOpen={showRegisterModal}
-        onSubmit={handleRegister}
+        show={showManagementModal}
+        loading={updateLoading}
+        onSubmit={handleUpdateUser}
+        onRefresh={handleRefresh}
+        onClose={() => setShowManagementModal(false)}
       />
+      <DeleteModal show={showDeleteModal} onConfirm={handleConfirmDelete} onClose={() => setShowDeleteModal(false)} />
     </React.Fragment>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = authenticatedPage(async (ctx) => {
   const api = apiConfiguration(ctx);
-  const usersRes = await api.get('/user');
-  const companiesRes = await api.get('/company');
+  const getUsers = await api.get('/user');
+  const getCompanies = await api.get('/company');
 
   return {
     props: {
-      users: usersRes.data,
-      companies: companiesRes.data,
+      users: getUsers.data,
+      companies: getCompanies.data,
     },
   };
 });

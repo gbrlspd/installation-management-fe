@@ -1,18 +1,13 @@
 import React, { FormEvent, useState } from 'react';
 import { Button, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-bootstrap';
-
-export interface INewCompany {
-  prefix: string;
-  name: string;
-  country: string;
-}
+import { INewCompany } from '@/interfaces/company';
 
 export interface INewCompanyModalProps {
+  show: boolean;
   loading: boolean;
-  isOpen: boolean;
   onSubmit: (data: INewCompany) => void;
-  refreshTable: () => void;
-  toggleRegisterModal: () => void;
+  onRefresh: () => void;
+  onClose: () => void;
 }
 
 export default function NewCompanyModal(props: INewCompanyModalProps) {
@@ -27,13 +22,13 @@ export default function NewCompanyModal(props: INewCompanyModalProps) {
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     props.onSubmit(newCompany);
-    props.toggleRegisterModal();
-    props.refreshTable();
+    props.onClose();
+    props.onRefresh();
     setNewCompany(initialState);
   };
 
   return (
-    <Modal show={props.isOpen} onHide={props.toggleRegisterModal} size='lg'>
+    <Modal show={props.show} onHide={props.onClose} size='lg'>
       <Form onSubmit={handleSubmit}>
         <Modal.Header className='bg-light'>
           <Modal.Title>New Company</Modal.Title>
@@ -81,7 +76,7 @@ export default function NewCompanyModal(props: INewCompanyModalProps) {
           </Row>
         </Modal.Body>
         <Modal.Footer className='bg-light'>
-          <Button variant='danger' onClick={props.toggleRegisterModal}>
+          <Button variant='danger' onClick={props.onClose}>
             Cancel
           </Button>
           <div className='d-grid'>

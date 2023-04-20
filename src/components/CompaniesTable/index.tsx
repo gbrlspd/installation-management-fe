@@ -1,12 +1,12 @@
-import Link from 'next/link';
 import React from 'react';
+import Link from 'next/link';
 import { Button, Table } from 'react-bootstrap';
 import { ICompanyProps } from '@/interfaces/company';
 
 export interface ICompanyTableProps {
   companiesList: ICompanyProps[];
-  deleteCompany: (prefix: string) => void;
-  showCompanyInfo: (prefix: string) => void;
+  onCompanyInfoClick: (prefix: string) => void;
+  onDeleteCompanyClick: (prefix: string) => void;
 }
 
 export default function CompaniesTable(props: ICompanyTableProps) {
@@ -35,7 +35,7 @@ export default function CompaniesTable(props: ICompanyTableProps) {
             <td className='d-none d-sm-table-cell'>{company.updated_at.split('T')[0]}</td>
 
             <td className='text-center'>
-              <Button size='sm' variant='info me-2' onClick={() => props.showCompanyInfo(company.prefix)}>
+              <Button size='sm' variant='info me-2' onClick={() => props.onCompanyInfoClick(company.prefix)}>
                 <i aria-hidden={true} className='fas fa-info-circle'></i>
               </Button>
               <Link href={`/companies/${company.prefix}`}>
@@ -43,7 +43,7 @@ export default function CompaniesTable(props: ICompanyTableProps) {
                   <i aria-hidden={true} className='text-white fas fa-wrench'></i>
                 </Button>
               </Link>
-              <Button size='sm' variant='danger' onClick={() => props.deleteCompany(company.prefix)}>
+              <Button size='sm' variant='danger' onClick={() => props.onDeleteCompanyClick(company.prefix)}>
                 <i aria-hidden={true} className='fas fa-trash'></i>
               </Button>
             </td>

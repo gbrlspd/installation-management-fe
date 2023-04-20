@@ -1,7 +1,7 @@
-import { IStoreProps } from '@/interfaces/store';
-import Link from 'next/link';
 import React from 'react';
+import Link from 'next/link';
 import { Alert, Button, Col, Form, InputGroup, Modal, Row } from 'react-bootstrap';
+import { IStoreProps } from '@/interfaces/store';
 
 export interface IStoreCredentialsModalProps {
   store: IStoreProps;

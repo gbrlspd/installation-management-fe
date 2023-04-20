@@ -1,7 +1,7 @@
-import { AuthContext } from '@/contexts/AuthContext';
-import { useRouter } from 'next/router';
 import React, { useContext } from 'react';
+import { useRouter } from 'next/router';
 import { Container, Nav, Navbar } from 'react-bootstrap';
+import { AuthContext } from '@/contexts/AuthContext';
 
 export default function Header() {
   const { user, logoutUser } = useContext(AuthContext);

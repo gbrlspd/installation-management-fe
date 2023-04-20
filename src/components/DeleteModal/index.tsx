@@ -1,12 +1,12 @@
 import { Modal, Button } from 'react-bootstrap';
 
-type ConfirmModalProps = {
+type DeleteModalProps = {
   show: boolean;
-  onClose: () => void;
   onConfirm: () => void;
+  onClose: () => void;
 };
 
-export default function ConfirmationModal(props: ConfirmModalProps) {
+export default function DeleteModal(props: DeleteModalProps) {
   return (
     <Modal show={props.show} onHide={props.onClose}>
       <Modal.Header>

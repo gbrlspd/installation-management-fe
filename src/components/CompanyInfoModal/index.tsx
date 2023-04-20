@@ -1,6 +1,7 @@
-import { ICompanyProps } from '@/interfaces/company';
 import React from 'react';
+import Link from 'next/link';
 import { Alert, Button, Col, Form, InputGroup, Modal, Row } from 'react-bootstrap';
+import { ICompanyProps } from '@/interfaces/company';
 
 export interface ICompanyInfoModalProps {
   company: ICompanyProps;
@@ -108,11 +109,11 @@ export default function CompanyInfoModal(props: ICompanyInfoModalProps) {
           <Button variant='danger' onClick={props.onClose}>
             Cancel
           </Button>
-          <div className='d-grid'>
+          <Link href={`/companies/${prefix}`}>
             <Button variant='info' type='submit'>
               Edit
             </Button>
-          </div>
+          </Link>
         </Modal.Footer>
       </Form>
     </Modal>
