@@ -4,8 +4,8 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { Button, Card, Col, Container, Form, InputGroup, Row, Spinner } from 'react-bootstrap';
 
-import { AuthContext } from '@/contexts/AuthContext';
 import logo from '../../public/logo.png';
+import { AuthContext } from '@/contexts/AuthContext';
 import { unauthenticatedPage } from '@/authentication/unauthenticatedPage';
 
 export default function Home() {

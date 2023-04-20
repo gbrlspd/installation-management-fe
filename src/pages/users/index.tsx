@@ -16,13 +16,13 @@ import NewUserModal from '@/components/NewUserModal';
 import UserManagementModal from '@/components/UserManagementModal';
 import DeleteModal from '@/components/DeleteModal';
 
-interface IUserPageProps {
+interface IUsersPageProps {
   user: IUserProps;
   users: IUserProps[];
   companies: ICompanyProps[];
 }
 
-export default function Users({ users, user, companies }: IUserPageProps) {
+export default function Users({ users, user, companies }: IUsersPageProps) {
   const companiesList = companies;
   const [usersList, setUsersList] = useState(users || []);
   const [search, setSearch] = useState('');
@@ -34,7 +34,7 @@ export default function Users({ users, user, companies }: IUserPageProps) {
   const [selectedUser, setSelectedUser] = useState(user || users[0]);
   const [selectedUserToDelete, setSelectedUserToDelete] = useState('');
 
-  function handleSearchChange({ users, search }) {
+  function handleSearchChange({ users, search }: { users: IUserProps[]; search: string }) {
     const tempUsers = users.filter(
       (user) =>
         user.username.toLowerCase().includes(search.toLowerCase()) ||

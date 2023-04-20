@@ -14,13 +14,14 @@ import CompaniesTable from '@/components/CompaniesTable';
 import NewCompanyModal from '@/components/NewCompanyModal';
 import CompanyInfoModal from '@/components/CompanyInfoModal';
 import DeleteModal from '@/components/DeleteModal';
+import { toast } from 'react-toastify';
 
-interface ICompanyPageProps {
+interface ICompaniesPageProps {
   company: ICompanyProps;
   companies: ICompanyProps[];
 }
 
-export default function Companies({ companies, company }: ICompanyPageProps) {
+export default function Companies({ companies, company }: ICompaniesPageProps) {
   const [companiesList, setCompaniesList] = useState(companies || []);
   const [search, setSearch] = useState('');
   const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -30,7 +31,7 @@ export default function Companies({ companies, company }: ICompanyPageProps) {
   const [selectedCompany, setSelectedCompany] = useState(company || companies[0]);
   const [selectedCompanyToDelete, setSelectedCompanyToDelete] = useState('');
 
-  function handleSearchChange({ companies, search }) {
+  function handleSearchChange({ companies, search }: { companies: ICompanyProps[]; search: string }) {
     const tempCompanies = companies.filter(
       (company) =>
         company.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -53,6 +54,7 @@ export default function Companies({ companies, company }: ICompanyPageProps) {
         setShowRegisterModal(false);
         setRegisterLoading(false);
         handleRefresh();
+        toast.success('Company successfully created', { autoClose: 3000 });
       })
       .catch((err) => {
         console.log(err);
@@ -82,6 +84,7 @@ export default function Companies({ companies, company }: ICompanyPageProps) {
       .delete(`/company/${selectedCompanyToDelete}`)
       .then(() => {
         handleRefresh();
+        toast.success('Company successfully deleted', { autoClose: 3000 });
       })
       .catch((err) => {
         console.log(err);

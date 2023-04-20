@@ -18,12 +18,12 @@ export default function UserManagementModal(props: IUserManagementModalProps) {
   const initialUserState = { company_prefix: company_prefix, username: username, email: email, password: '' };
   const [userUpdate, setUserUpdate] = useState(initialUserState);
 
-  const handleInputChange = (event) => {
+  function handleInputChange(event) {
     const { name, value } = event.target;
     setUserUpdate({ ...userUpdate, [name]: value });
-  };
+  }
 
-  const handleSubmit = (event: FormEvent) => {
+  function handleSubmit(event: FormEvent) {
     const updatedFields: IUserUpdate = {};
     event.preventDefault();
 
@@ -44,7 +44,7 @@ export default function UserManagementModal(props: IUserManagementModalProps) {
     props.onClose();
     props.onRefresh();
     setUserUpdate(initialUserState);
-  };
+  }
 
   useEffect(() => {
     setUserUpdate({

@@ -17,13 +17,13 @@ import StoreInfoModal from '@/components/StoreInfoModal';
 import StoreCredentialsModal from '@/components/StoreCredentialsModal';
 import DeleteModal from '@/components/DeleteModal';
 
-export interface IStorePageProps {
+export interface IStoresPageProps {
   store: IStoreProps;
   stores: IStoreProps[];
   companies: ICompanyProps[];
 }
 
-export default function Stores({ stores, store, companies }: IStorePageProps) {
+export default function Stores({ stores, store, companies }: IStoresPageProps) {
   const companiesList = companies;
   const [storesList, setStoresList] = useState(stores || []);
   const [search, setSearch] = useState('');
@@ -35,7 +35,7 @@ export default function Stores({ stores, store, companies }: IStorePageProps) {
   const [selectedStore, setSelectedStore] = useState(store || stores[0]);
   const [selectedStoreToDelete, setSelectedStoreToDelete] = useState('');
 
-  function handleSearchChange({ stores, search }) {
+  function handleSearchChange({ stores, search }: { stores: IStoreProps[]; search: string }) {
     const tempStores = stores.filter(
       (store) =>
         store.name.toLowerCase().includes(search.toLowerCase()) ||
