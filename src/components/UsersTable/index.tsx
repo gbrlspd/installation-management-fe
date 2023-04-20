@@ -1,11 +1,11 @@
 import React from 'react';
-import { IUserProps } from '@/interfaces/user';
 import { Button, Table } from 'react-bootstrap';
+import { IUserProps } from '@/interfaces/user';
 
 export interface IUsersTableProps {
   usersList: IUserProps[];
-  deleteUser: (id: string, username: string) => void;
-  showUserManagement: (id: string) => void;
+  onUserManagementClick: (id: string) => void;
+  onDeleteUserClick: (id: string, username: string) => void;
 }
 
 export default function UsersTable(props: IUsersTableProps) {
@@ -33,10 +33,10 @@ export default function UsersTable(props: IUsersTableProps) {
             <td className='d-none d-sm-table-cell'>{user.email}</td>
             <td className='d-none d-sm-table-cell'>{user.updated_at.split('T')[0]}</td>
             <td className='text-center'>
-              <Button size='sm' variant='success' className='me-2' onClick={() => props.showUserManagement(user.id)}>
+              <Button size='sm' variant='success' className='me-2' onClick={() => props.onUserManagementClick(user.id)}>
                 <i aria-hidden={true} className='text-white fas fa-wrench'></i>
               </Button>
-              <Button size='sm' variant='danger' onClick={() => props.deleteUser(user.id, user.username)}>
+              <Button size='sm' variant='danger' onClick={() => props.onDeleteUserClick(user.id, user.username)}>
                 <i aria-hidden={true} className='fas fa-trash'></i>
               </Button>
             </td>

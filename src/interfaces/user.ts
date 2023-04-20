@@ -9,3 +9,17 @@ export interface IUserProps {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface INewUser {
+  company_prefix: string;
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface IUserUpdate {
+  company_prefix?: string;
+  username?: string;
+  email?: string;
+  password?: string;
+}

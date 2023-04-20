@@ -1,6 +1,6 @@
-import { ICompanyProps } from '@/interfaces/company';
 import React from 'react';
 import { Alert, Button, Col, Form, InputGroup, Modal, Row } from 'react-bootstrap';
+import { ICompanyProps } from '@/interfaces/company';
 
 export interface ICompanyInfoModalProps {
   company: ICompanyProps;

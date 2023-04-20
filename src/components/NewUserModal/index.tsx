@@ -1,21 +1,15 @@
 import React, { FormEvent, useState } from 'react';
-import { ICompanyProps } from '@/interfaces/company';
 import { Button, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-bootstrap';
-
-export interface INewUser {
-  company_prefix: string;
-  username: string;
-  email: string;
-  password: string;
-}
+import { INewUser } from '@/interfaces/user';
+import { ICompanyProps } from '@/interfaces/company';
 
 export interface INewUserModalProps {
-  loading: boolean;
-  isOpen: boolean;
   companiesList: ICompanyProps[];
+  show: boolean;
+  loading: boolean;
   onSubmit: (data: INewUser) => void;
-  refreshTable: () => void;
-  toggleRegisterModal: () => void;
+  onRefresh: () => void;
+  onClose: () => void;
 }
 
 export default function NewUserModal(props: INewUserModalProps) {
@@ -30,13 +24,13 @@ export default function NewUserModal(props: INewUserModalProps) {
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     props.onSubmit(newUser);
-    props.toggleRegisterModal();
-    props.refreshTable();
+    props.onClose();
+    props.onRefresh();
     setNewUser(initialState);
   };
 
   return (
-    <Modal show={props.isOpen} onHide={props.toggleRegisterModal} size='lg'>
+    <Modal show={props.show} onHide={props.onClose} size='lg'>
       <Form onSubmit={handleSubmit}>
         <Modal.Header className='bg-light'>
           <Modal.Title>New User</Modal.Title>
@@ -97,7 +91,7 @@ export default function NewUserModal(props: INewUserModalProps) {
           </Row>
         </Modal.Body>
         <Modal.Footer className='bg-light'>
-          <Button variant='danger' onClick={props.toggleRegisterModal}>
+          <Button variant='danger' onClick={props.onClose}>
             Cancel
           </Button>
           <div className='d-grid'>

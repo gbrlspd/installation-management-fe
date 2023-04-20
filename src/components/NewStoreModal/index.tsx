@@ -1,22 +1,15 @@
 import React, { FormEvent, useState } from 'react';
-import { ICompanyProps } from '@/interfaces/company';
 import { Button, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-bootstrap';
-
-export interface INewStore {
-  id: string;
-  company_prefix: string;
-  name: string;
-  city: string;
-  status: string;
-}
+import { INewStore } from '@/interfaces/store';
+import { ICompanyProps } from '@/interfaces/company';
 
 export interface INewStoreModalProps {
-  loading: boolean;
-  isOpen: boolean;
   companiesList: ICompanyProps[];
+  show: boolean;
+  loading: boolean;
   onSubmit: (data: INewStore) => void;
-  refreshTable: () => void;
-  toggleRegisterModal: () => void;
+  onRefresh: () => void;
+  onClose: () => void;
 }
 
 export default function NewStoreModal(props: INewStoreModalProps) {
@@ -31,13 +24,13 @@ export default function NewStoreModal(props: INewStoreModalProps) {
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     props.onSubmit(newStore);
-    props.toggleRegisterModal();
-    props.refreshTable();
+    props.onClose();
+    props.onRefresh();
     setNewStore(initialState);
   };
 
   return (
-    <Modal show={props.isOpen} onHide={props.toggleRegisterModal} size='lg'>
+    <Modal show={props.show} onHide={props.onClose} size='lg'>
       <Form onSubmit={handleSubmit}>
         <Modal.Header className='bg-light'>
           <Modal.Title>New Store</Modal.Title>
@@ -109,7 +102,7 @@ export default function NewStoreModal(props: INewStoreModalProps) {
           </Row>
         </Modal.Body>
         <Modal.Footer className='bg-light'>
-          <Button variant='danger' onClick={props.toggleRegisterModal}>
+          <Button variant='danger' onClick={props.onClose}>
             Cancel
           </Button>
           <div className='d-grid'>

@@ -1,22 +1,15 @@
-import { ICompanyProps } from '@/interfaces/company';
-import { IUserProps } from '@/interfaces/user';
 import React, { FormEvent, useEffect, useState } from 'react';
 import { Button, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-bootstrap';
-
-export interface IUserUpdate {
-  company_prefix?: string;
-  username?: string;
-  email?: string;
-  password?: string;
-}
+import { IUserProps, IUserUpdate } from '@/interfaces/user';
+import { ICompanyProps } from '@/interfaces/company';
 
 export interface IUserManagementModalProps {
   user: IUserProps;
   companiesList: ICompanyProps[];
-  loading: boolean;
   show: boolean;
+  loading: boolean;
   onSubmit: (id: string, data: IUserUpdate) => void;
-  refreshTable: () => void;
+  onRefresh: () => void;
   onClose: () => void;
 }
 
@@ -49,7 +42,7 @@ export default function UserManagementModal(props: IUserManagementModalProps) {
 
     props.onSubmit(id, updatedFields);
     props.onClose();
-    props.refreshTable();
+    props.onRefresh();
     setUserUpdate(initialUserState);
   };
 

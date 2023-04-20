@@ -1,13 +1,13 @@
-import Link from 'next/link';
 import React from 'react';
-import { IStoreProps } from '@/interfaces/store';
+import Link from 'next/link';
 import { Alert, Button, Table } from 'react-bootstrap';
+import { IStoreProps } from '@/interfaces/store';
 
 export interface IStoreTableProps {
   storesList: IStoreProps[];
-  deleteStore: (id: string) => void;
-  showStoreInfo: (id: string) => void;
-  showStoreCredentials: (id: string) => void;
+  onStoreInfoClick: (id: string) => void;
+  onStoreCredentialsClick: (id: string) => void;
+  onDeleteStoreClick: (id: string) => void;
 }
 
 export default function StoresTable(props: IStoreTableProps) {
@@ -53,10 +53,10 @@ export default function StoresTable(props: IStoreTableProps) {
             </td>
             <td className='d-none d-sm-table-cell'>{store.updated_at.split('T')[0]}</td>
             <td className='text-center'>
-              <Button size='sm' variant='info me-2' onClick={() => props.showStoreInfo(store.id)}>
+              <Button size='sm' variant='info me-2' onClick={() => props.onStoreInfoClick(store.id)}>
                 <i aria-hidden={true} className='fas fa-info-circle'></i>
               </Button>
-              <Button size='sm' variant='warning me-2' onClick={() => props.showStoreCredentials(store.id)}>
+              <Button size='sm' variant='warning me-2' onClick={() => props.onStoreCredentialsClick(store.id)}>
                 <i aria-hidden={true} className='fas fa-key'></i>
               </Button>
               <Link href={`/stores/${store.id}`}>
@@ -64,7 +64,7 @@ export default function StoresTable(props: IStoreTableProps) {
                   <i aria-hidden={true} className='text-white fas fa-wrench'></i>
                 </Button>
               </Link>
-              <Button size='sm' variant='danger' onClick={() => props.deleteStore(store.id)}>
+              <Button size='sm' variant='danger' onClick={() => props.onDeleteStoreClick(store.id)}>
                 <i aria-hidden={true} className='fas fa-trash'></i>
               </Button>
             </td>

@@ -17,3 +17,9 @@ export interface ICompanyProps {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface INewCompany {
+  prefix: string;
+  name: string;
+  country: string;
+}

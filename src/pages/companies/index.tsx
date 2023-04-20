@@ -2,16 +2,18 @@ import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
 import { Card, Container } from 'react-bootstrap';
-import { ICompanyProps } from '@/interfaces/company';
-import { authenticatedPage } from '@/authentication/authenticatedPage';
+
 import { api } from '@/services/apiClient';
 import { apiConfiguration } from '@/services/api';
+import { authenticatedPage } from '@/authentication/authenticatedPage';
+
+import { ICompanyProps, INewCompany } from '@/interfaces/company';
 import Header from '@/components/Header';
-import CompaniesTable from '@/components/CompaniesTable';
 import CardTableHeader from '@/components/CardTableHeader';
-import NewCompanyModal, { INewCompany } from '@/components/NewCompanyModal';
+import CompaniesTable from '@/components/CompaniesTable';
+import NewCompanyModal from '@/components/NewCompanyModal';
 import CompanyInfoModal from '@/components/CompanyInfoModal';
-import ConfirmationModal from '@/components/ConfirmationModal';
+import DeleteModal from '@/components/DeleteModal';
 
 interface ICompanyPageProps {
   company: ICompanyProps;
@@ -19,46 +21,31 @@ interface ICompanyPageProps {
 }
 
 export default function Companies({ companies, company }: ICompanyPageProps) {
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [registerLoading, setRegisterLoading] = useState(false);
-  const [showDeletionModal, setShowDeletionModal] = useState(false);
-  const [selectedCompanyToDelete, setSelectedCompanyToDelete] = useState('');
-  const [showInfoModal, setShowInfoModal] = useState(false);
-  const [search, setSearch] = useState('');
   const [companiesList, setCompaniesList] = useState(companies || []);
+  const [search, setSearch] = useState('');
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [registerLoading, setRegisterLoading] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState(company || companies[0]);
-  const toggleRegisterModal = () => setShowRegisterModal(!showRegisterModal);
-  const toggleInfoModal = () => setShowInfoModal(!showInfoModal);
+  const [selectedCompanyToDelete, setSelectedCompanyToDelete] = useState('');
 
-  const filterBySearch = ({ companies, search }) => {
+  function handleSearchChange({ companies, search }) {
     const tempCompanies = companies.filter(
       (company) =>
         company.name.toLowerCase().includes(search.toLowerCase()) ||
         company.prefix.toLowerCase().includes(search.toLowerCase()) ||
         company.country.toLowerCase().includes(search.toLowerCase())
     );
-    /* This function sorts an array alphabetically based on the given field */
     setCompaniesList(tempCompanies.slice().sort((a, b) => a.country.localeCompare(b.country)));
-  };
+  }
 
   async function handleRefresh() {
     const res = await api.get('/company');
     setCompaniesList(res.data.slice().sort((a, b) => a.country.localeCompare(b.country)));
   }
 
-  async function handleInfoClick(prefix: string) {
-    await api
-      .get(`/company/${prefix}`)
-      .then((res) => {
-        setSelectedCompany(res.data);
-        setShowInfoModal(true);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
-  async function handleRegister(data: INewCompany) {
+  async function handleRegisterCompany(data: INewCompany) {
     setRegisterLoading(true);
     await api
       .post('/company', data)
@@ -73,10 +60,22 @@ export default function Companies({ companies, company }: ICompanyPageProps) {
       });
   }
 
-  const handleDeleteClick = (prefix: string) => {
+  async function handleCompanyInfoClick(prefix: string) {
+    await api
+      .get(`/company/${prefix}`)
+      .then((res) => {
+        setSelectedCompany(res.data);
+        setShowInfoModal(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function handleDeleteCompanyClick(prefix: string) {
     setSelectedCompanyToDelete(prefix);
-    setShowDeletionModal(true);
-  };
+    setShowDeleteModal(true);
+  }
 
   async function handleConfirmDelete() {
     await api
@@ -88,11 +87,11 @@ export default function Companies({ companies, company }: ICompanyPageProps) {
         console.log(err);
       });
     setSelectedCompanyToDelete('');
-    setShowDeletionModal(false);
+    setShowDeleteModal(false);
   }
 
   useEffect(() => {
-    filterBySearch({ companies, search });
+    handleSearchChange({ companies, search });
   }, [companies, search]);
 
   return (
@@ -105,46 +104,46 @@ export default function Companies({ companies, company }: ICompanyPageProps) {
         <Card>
           <CardTableHeader
             title='Companies'
-            faIcon='fa-landmark'
-            itemQty={companiesList.length}
-            search={search}
-            handleChangeSearch={(search) => setSearch(search)}
-            refreshTable={handleRefresh}
-            toggleRegisterModal={toggleRegisterModal}
+            icon='fa-landmark'
+            totalItems={companiesList.length}
+            searchValue={search}
+            onSearchChange={(search) => setSearch(search)}
+            onRefresh={handleRefresh}
+            onRegisterClick={() => setShowRegisterModal(!showRegisterModal)}
           />
           <Card.Body className='p-0'>
             <CompaniesTable
               companiesList={companiesList}
-              deleteCompany={handleDeleteClick}
-              showCompanyInfo={handleInfoClick}
+              onCompanyInfoClick={handleCompanyInfoClick}
+              onDeleteCompanyClick={handleDeleteCompanyClick}
             />
           </Card.Body>
         </Card>
       </Container>
-      <ConfirmationModal
-        show={showDeletionModal}
-        onClose={() => setShowDeletionModal(false)}
-        onConfirm={handleConfirmDelete}
-      />
       <NewCompanyModal
+        show={showRegisterModal}
         loading={registerLoading}
-        refreshTable={handleRefresh}
-        toggleRegisterModal={toggleRegisterModal}
-        isOpen={showRegisterModal}
-        onSubmit={handleRegister}
+        onSubmit={handleRegisterCompany}
+        onRefresh={handleRefresh}
+        onClose={() => setShowRegisterModal(!showRegisterModal)}
       />
-      <CompanyInfoModal show={showInfoModal} onClose={toggleInfoModal} company={selectedCompany} />
+      <CompanyInfoModal
+        company={selectedCompany}
+        show={showInfoModal}
+        onClose={() => setShowInfoModal(!showInfoModal)}
+      />
+      <DeleteModal show={showDeleteModal} onConfirm={handleConfirmDelete} onClose={() => setShowDeleteModal(false)} />
     </React.Fragment>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = authenticatedPage(async (ctx) => {
   const api = apiConfiguration(ctx);
-  const res = await api.get('/company');
+  const getCompanies = await api.get('/company');
 
   return {
     props: {
-      companies: res.data,
+      companies: getCompanies.data,
     },
   };
 });
