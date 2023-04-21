@@ -95,7 +95,7 @@ export default function Users({ users, user, companies }: IUsersPageProps) {
   }
 
   function handleDeleteUserClick(id: string, username: string) {
-    if (username === 'gspada') {
+    if (username === '') {
       console.log('Do not delete my user bro...');
     } else {
       setSelectedUserToDelete(id);
