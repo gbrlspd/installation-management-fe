@@ -15,6 +15,7 @@ import UsersTable from '@/components/UsersTable';
 import NewUserModal from '@/components/NewUserModal';
 import UserManagementModal from '@/components/UserManagementModal';
 import DeleteModal from '@/components/DeleteModal';
+import { toast } from 'react-toastify';
 
 interface IUsersPageProps {
   user: IUserProps;
@@ -57,6 +58,7 @@ export default function Users({ users, user, companies }: IUsersPageProps) {
         setShowRegisterModal(false);
         setRegisterLoading(false);
         handleRefresh();
+        toast.success('User successfully created', { autoClose: 3000 });
       })
       .catch((err) => {
         console.log(err);
@@ -84,6 +86,7 @@ export default function Users({ users, user, companies }: IUsersPageProps) {
         setShowManagementModal(false);
         setUpdateLoading(false);
         handleRefresh();
+        toast.success('User successfully updated', { autoClose: 3000 });
       })
       .catch((err) => {
         console.log(err);
@@ -105,6 +108,7 @@ export default function Users({ users, user, companies }: IUsersPageProps) {
       .delete(`/user/${selectedUserToDelete}`)
       .then(() => {
         handleRefresh();
+        toast.success('User successfully deleted', { autoClose: 3000 });
       })
       .catch((err) => {
         console.log(err);

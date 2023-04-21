@@ -2,6 +2,7 @@ import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
 import { Card, Container } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 
 import { api } from '@/services/apiClient';
 import { apiConfiguration } from '@/services/api';
@@ -14,7 +15,6 @@ import CompaniesTable from '@/components/CompaniesTable';
 import NewCompanyModal from '@/components/NewCompanyModal';
 import CompanyInfoModal from '@/components/CompanyInfoModal';
 import DeleteModal from '@/components/DeleteModal';
-import { toast } from 'react-toastify';
 
 interface ICompaniesPageProps {
   company: ICompanyProps;

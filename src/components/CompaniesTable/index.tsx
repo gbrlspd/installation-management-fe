@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Button, Table } from 'react-bootstrap';
+import { Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
 import { ICompanyProps } from '@/interfaces/company';
 
 export interface ICompanyTableProps {
@@ -10,6 +10,10 @@ export interface ICompanyTableProps {
 }
 
 export default function CompaniesTable(props: ICompanyTableProps) {
+  const renderInfoTooltip = (props) => <Tooltip {...props}>Info</Tooltip>;
+  const renderManagementTooltip = (props) => <Tooltip {...props}>Management</Tooltip>;
+  const renderDeleteTooltip = (props) => <Tooltip {...props}>Delete</Tooltip>;
+
   return (
     <Table hover={true} className='mb-0'>
       <thead className='bg-primary text-white'>
@@ -35,17 +39,23 @@ export default function CompaniesTable(props: ICompanyTableProps) {
             <td className='d-none d-sm-table-cell'>{company.updated_at.split('T')[0]}</td>
 
             <td className='text-center'>
-              <Button size='sm' variant='info me-2' onClick={() => props.onCompanyInfoClick(company.prefix)}>
-                <i aria-hidden={true} className='fas fa-info-circle'></i>
-              </Button>
-              <Link href={`/companies/${company.prefix}`}>
-                <Button size='sm' variant='success' className='me-2'>
-                  <i aria-hidden={true} className='text-white fas fa-wrench'></i>
+              <OverlayTrigger overlay={renderInfoTooltip}>
+                <Button size='sm' variant='info me-2' onClick={() => props.onCompanyInfoClick(company.prefix)}>
+                  <i aria-hidden={true} className='fas fa-info-circle'></i>
                 </Button>
+              </OverlayTrigger>
+              <Link href={`/companies/${company.prefix}`}>
+                <OverlayTrigger overlay={renderManagementTooltip}>
+                  <Button size='sm' variant='success' className='me-2'>
+                    <i aria-hidden={true} className='text-white fas fa-wrench'></i>
+                  </Button>
+                </OverlayTrigger>
               </Link>
-              <Button size='sm' variant='danger' onClick={() => props.onDeleteCompanyClick(company.prefix)}>
-                <i aria-hidden={true} className='fas fa-trash'></i>
-              </Button>
+              <OverlayTrigger overlay={renderDeleteTooltip}>
+                <Button size='sm' variant='danger' onClick={() => props.onDeleteCompanyClick(company.prefix)}>
+                  <i aria-hidden={true} className='fas fa-trash'></i>
+                </Button>
+              </OverlayTrigger>
             </td>
           </tr>
         ))}

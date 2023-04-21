@@ -17,6 +17,7 @@ export default function UserManagementModal(props: IUserManagementModalProps) {
   const { id, company_prefix, username, email } = props.user;
   const initialUserState = { company_prefix: company_prefix, username: username, email: email, password: '' };
   const [userUpdate, setUserUpdate] = useState(initialUserState);
+  const [passwordLocked, setPasswordLocked] = useState(true);
 
   function handleInputChange(event) {
     const { name, value } = event.target;
@@ -93,12 +94,15 @@ export default function UserManagementModal(props: IUserManagementModalProps) {
               <InputGroup>
                 <InputGroup.Text>Password</InputGroup.Text>
                 <Form.Control
+                  disabled={passwordLocked}
                   name='password'
                   type='text'
                   value={userUpdate.password}
                   onChange={handleInputChange}
-                  placeholder='If it is empty it will not be changed...'
                 />
+                <Button variant='warning' id='button-addon2' onClick={() => setPasswordLocked(!passwordLocked)}>
+                  {passwordLocked ? <i className='fas fa-unlock'></i> : <i className='fas fa-lock'></i>}
+                </Button>
               </InputGroup>
             </Col>
           </Row>
