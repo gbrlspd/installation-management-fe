@@ -88,16 +88,11 @@ export default function NewStoreModal(props: INewStoreModalProps) {
               </InputGroup>
             </Col>
             <Col md={4}>
-              <InputGroup>
-                <InputGroup.Text>Status</InputGroup.Text>
-                <Form.Control
-                  name='status'
-                  required={true}
-                  value={newStore.status}
-                  onChange={handleInputChange}
-                  placeholder='Operational'
-                />
-              </InputGroup>
+              <Form.Select name='status' value={newStore.status} onChange={handleInputChange}>
+                <option>Status</option>
+                <option value='Operational'>Operational</option>
+                <option value='Closed'>Closed</option>
+              </Form.Select>
             </Col>
           </Row>
         </Modal.Body>

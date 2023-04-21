@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Table } from 'react-bootstrap';
+import { Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
 import { IUserProps } from '@/interfaces/user';
 
 export interface IUsersTableProps {
@@ -9,6 +9,9 @@ export interface IUsersTableProps {
 }
 
 export default function UsersTable(props: IUsersTableProps) {
+  const renderManagementTooltip = (props) => <Tooltip {...props}>Management</Tooltip>;
+  const renderDeleteTooltip = (props) => <Tooltip {...props}>Delete</Tooltip>;
+
   return (
     <Table hover={true} className='mb-0'>
       <thead className='bg-primary text-white'>
@@ -33,12 +36,20 @@ export default function UsersTable(props: IUsersTableProps) {
             <td className='d-none d-sm-table-cell'>{user.email}</td>
             <td className='d-none d-sm-table-cell'>{user.updated_at.split('T')[0]}</td>
             <td className='text-center'>
-              <Button size='sm' variant='success' className='me-2' onClick={() => props.onUserManagementClick(user.id)}>
-                <i aria-hidden={true} className='text-white fas fa-wrench'></i>
-              </Button>
-              <Button size='sm' variant='danger' onClick={() => props.onDeleteUserClick(user.id, user.username)}>
-                <i aria-hidden={true} className='fas fa-trash'></i>
-              </Button>
+              <OverlayTrigger overlay={renderManagementTooltip}>
+                <Button
+                  size='sm'
+                  variant='success'
+                  className='me-2'
+                  onClick={() => props.onUserManagementClick(user.id)}>
+                  <i aria-hidden={true} className='text-white fas fa-wrench'></i>
+                </Button>
+              </OverlayTrigger>
+              <OverlayTrigger overlay={renderDeleteTooltip}>
+                <Button size='sm' variant='danger' onClick={() => props.onDeleteUserClick(user.id, user.username)}>
+                  <i aria-hidden={true} className='fas fa-trash'></i>
+                </Button>
+              </OverlayTrigger>
             </td>
           </tr>
         ))}

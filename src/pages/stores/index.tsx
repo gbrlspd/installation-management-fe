@@ -16,6 +16,7 @@ import NewStoreModal from '@/components/NewStoreModal';
 import StoreInfoModal from '@/components/StoreInfoModal';
 import StoreCredentialsModal from '@/components/StoreCredentialsModal';
 import DeleteModal from '@/components/DeleteModal';
+import { toast } from 'react-toastify';
 
 export interface IStoresPageProps {
   store: IStoreProps;
@@ -58,6 +59,7 @@ export default function Stores({ stores, store, companies }: IStoresPageProps) {
         setShowRegisterModal(false);
         setRegisterLoading(false);
         handleRefresh();
+        toast.success('Store successfully created', { autoClose: 3000 });
       })
       .catch((err) => {
         console.log(err);
@@ -103,6 +105,7 @@ export default function Stores({ stores, store, companies }: IStoresPageProps) {
       .delete(`/store/${selectedStoreToDelete}`)
       .then(() => {
         handleRefresh();
+        toast.success('Store successfully deleted', { autoClose: 3000 });
       })
       .catch((err) => {
         console.log(err);

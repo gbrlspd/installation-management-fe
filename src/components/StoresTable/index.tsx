@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Alert, Button, Table } from 'react-bootstrap';
+import { Alert, Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
 import { IStoreProps } from '@/interfaces/store';
 
 export interface IStoreTableProps {
@@ -11,6 +11,11 @@ export interface IStoreTableProps {
 }
 
 export default function StoresTable(props: IStoreTableProps) {
+  const renderInfoTooltip = (props) => <Tooltip {...props}>Info</Tooltip>;
+  const renderManagementTooltip = (props) => <Tooltip {...props}>Management</Tooltip>;
+  const renderCredentialsTooltip = (props) => <Tooltip {...props}>Credentials</Tooltip>;
+  const renderDeleteTooltip = (props) => <Tooltip {...props}>Delete</Tooltip>;
+
   const validateStatus = (status) => {
     switch (status) {
       case 'Operational':
@@ -53,20 +58,28 @@ export default function StoresTable(props: IStoreTableProps) {
             </td>
             <td className='d-none d-sm-table-cell'>{store.updated_at.split('T')[0]}</td>
             <td className='text-center'>
-              <Button size='sm' variant='info me-2' onClick={() => props.onStoreInfoClick(store.id)}>
-                <i aria-hidden={true} className='fas fa-info-circle'></i>
-              </Button>
-              <Button size='sm' variant='warning me-2' onClick={() => props.onStoreCredentialsClick(store.id)}>
-                <i aria-hidden={true} className='fas fa-key'></i>
-              </Button>
-              <Link href={`/stores/${store.id}`}>
-                <Button size='sm' variant='success' className='me-2'>
-                  <i aria-hidden={true} className='text-white fas fa-wrench'></i>
+              <OverlayTrigger overlay={renderInfoTooltip}>
+                <Button size='sm' variant='info me-2' onClick={() => props.onStoreInfoClick(store.id)}>
+                  <i aria-hidden={true} className='fas fa-info-circle'></i>
                 </Button>
+              </OverlayTrigger>
+              <OverlayTrigger overlay={renderCredentialsTooltip}>
+                <Button size='sm' variant='warning me-2' onClick={() => props.onStoreCredentialsClick(store.id)}>
+                  <i aria-hidden={true} className='fas fa-key'></i>
+                </Button>
+              </OverlayTrigger>
+              <Link href={`/stores/${store.id}`}>
+                <OverlayTrigger overlay={renderManagementTooltip}>
+                  <Button size='sm' variant='success' className='me-2'>
+                    <i aria-hidden={true} className='text-white fas fa-wrench'></i>
+                  </Button>
+                </OverlayTrigger>
               </Link>
-              <Button size='sm' variant='danger' onClick={() => props.onDeleteStoreClick(store.id)}>
-                <i aria-hidden={true} className='fas fa-trash'></i>
-              </Button>
+              <OverlayTrigger overlay={renderDeleteTooltip}>
+                <Button size='sm' variant='danger' onClick={() => props.onDeleteStoreClick(store.id)}>
+                  <i aria-hidden={true} className='fas fa-trash'></i>
+                </Button>
+              </OverlayTrigger>
             </td>
           </tr>
         ))}
