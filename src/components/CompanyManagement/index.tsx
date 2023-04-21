@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap';
 import { ICompanyProps, ICompanyUpdate } from '@/interfaces/company';
-import Link from 'next/link';
 
 export interface ICompanyManagementProps {
   company: ICompanyProps;
@@ -14,7 +14,18 @@ export default function CompanyManagement(props: ICompanyManagementProps) {
 
   function handleInputChange(event) {
     const { name, value } = event.target;
-    setCompanyUpdate({ ...companyUpdate, [name]: value });
+    const numberFields = ['validator_qty'];
+    let parsedValue = value;
+
+    /* Converts the values of the inputs that have names defined within the array to integer values,
+    thus preventing a number as a string from being passed to the request */
+    if (numberFields.includes(name)) {
+      parsedValue = parseInt(value);
+      if (isNaN(parsedValue)) {
+        parsedValue = null;
+      }
+    }
+    setCompanyUpdate({ ...companyUpdate, [name]: parsedValue });
   }
 
   function handleSubmit(event) {
@@ -80,7 +91,7 @@ export default function CompanyManagement(props: ICompanyManagementProps) {
                 <InputGroup.Text>Qty.</InputGroup.Text>
                 <Form.Control
                   name='validator_qty'
-                  type='text'
+                  type='number'
                   value={companyUpdate.validator_qty ?? ''}
                   onChange={handleInputChange}
                 />

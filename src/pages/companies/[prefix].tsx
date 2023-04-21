@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
-import { Badge, Button, Card, Container } from 'react-bootstrap';
+import { Badge, Card, Container } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 
 import { api } from '@/services/apiClient';
 import { authenticatedPage } from '@/authentication/authenticatedPage';
 
-import Header from '@/components/Header';
 import { ICompanyProps, ICompanyUpdate } from '@/interfaces/company';
+import Header from '@/components/Header';
 import CompanyManagement from '@/components/CompanyManagement';
-import { toast } from 'react-toastify';
 
 export default function Companies() {
   const router = useRouter();
@@ -57,9 +57,9 @@ export default function Companies() {
         <Card>
           <Card.Header>
             <Card.Title className='mt-2 mb-2 d-flex align-items-center'>
+              <small className='text-muted me-2'>Company</small>
               {company?.name}
               <Badge className='ms-2 fw-normal bg-success'>{company?.prefix}</Badge>
-              <small className='text-muted ms-2'>Company</small>
             </Card.Title>
           </Card.Header>
           {company !== undefined && (

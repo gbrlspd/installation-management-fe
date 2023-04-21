@@ -1,14 +1,65 @@
+import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
-import React from 'react';
-import { GetServerSideProps } from 'next';
-import { authenticatedPage } from '@/authentication/authenticatedPage';
-import Header from '@/components/Header';
-import { Button, Card, Container, Form, InputGroup } from 'react-bootstrap';
 import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next';
+import { Badge, Button, Card, Container, Form, InputGroup } from 'react-bootstrap';
+import { toast } from 'react-toastify';
+
+import { api } from '@/services/apiClient';
+import { authenticatedPage } from '@/authentication/authenticatedPage';
+
+import { IStoreProps, IStoreUpdate } from '@/interfaces/store';
+import { ICompanyProps } from '@/interfaces/company';
+import Header from '@/components/Header';
+import StoreManagement from '@/components/StoreManagement';
 
 export default function Stores() {
   const router = useRouter();
   const { id } = router.query;
+  const [store, setStore] = useState<IStoreProps>();
+  const [companiesList, setCompaniesList] = useState<ICompanyProps[]>();
+  const [updateLoading, setUpdateLoading] = useState(false);
+
+  async function handleSetStore(id: string) {
+    await api
+      .get(`/store/${id}`)
+      .then((res) => {
+        setStore(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async function handleSetCompaniesList() {
+    await api
+      .get('/company')
+      .then((res) => {
+        setCompaniesList(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async function handleUpdateStore(id: string, updateData: IStoreUpdate) {
+    setUpdateLoading(true);
+    await api
+      .put(`/store/${id}`, updateData)
+      .then(() => {
+        setUpdateLoading(false);
+        toast.success('Store successfully edited', { autoClose: 3000 });
+      })
+      .catch((err) => {
+        toast.error(err, { autoClose: 3000 });
+        setUpdateLoading(false);
+      });
+  }
+
+  useEffect(() => {
+    handleSetStore(String(id));
+    handleSetCompaniesList();
+  }, []);
 
   return (
     <React.Fragment>
@@ -17,25 +68,22 @@ export default function Stores() {
       </Head>
       <Header />
       <Container>
-        <Card>
+        <Card className='mb-3'>
           <Card.Header>
-            <Card.Title className='mt-2 mb-3'>
-              ID: {id}
-              <i aria-hidden={true} className='fas fa-store ms-2'></i>
+            <Card.Title className='mt-2 mb-2 d-flex align-items-center'>
+              {store?.name}
+              <Badge className='ms-2 fw-normal bg-success'>{store?.id}</Badge>
+              <small className='text-muted ms-2'>{store?.company.name}</small>
             </Card.Title>
-            <Form className='d-flex mb-2'>
-              <InputGroup>
-                <InputGroup.Text>
-                  <i aria-hidden={true} className='fas fa-search'></i>
-                </InputGroup.Text>
-                <Form.Control type='text' placeholder='Search...' />
-              </InputGroup>
-              <Button variant='success' className='ms-2'>
-                <i aria-hidden={true} className='fas fa-plus'></i>
-              </Button>
-            </Form>
           </Card.Header>
-          <Card.Body></Card.Body>
+          {store && companiesList !== undefined && (
+            <StoreManagement
+              store={store}
+              companiesList={companiesList}
+              loading={updateLoading}
+              onSubmit={handleUpdateStore}
+            />
+          )}
         </Card>
       </Container>
     </React.Fragment>
