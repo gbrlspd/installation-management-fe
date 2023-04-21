@@ -66,16 +66,20 @@ export default function Users({ users, user, companies }: IUsersPageProps) {
       });
   }
 
-  async function handleUserManagementClick(id: string) {
-    await api
-      .get(`/user/${id}`)
-      .then((res) => {
-        setSelectedUser(res.data);
-        setShowManagementModal(true);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  async function handleUserManagementClick(id: string, username: string) {
+    if (username === 'gspada') {
+      console.log('Do not manage my user bro...');
+    } else {
+      await api
+        .get(`/user/${id}`)
+        .then((res) => {
+          setSelectedUser(res.data);
+          setShowManagementModal(true);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   }
 
   async function handleUpdateUser(id: string, updateData: IUserUpdate) {
@@ -95,7 +99,7 @@ export default function Users({ users, user, companies }: IUsersPageProps) {
   }
 
   function handleDeleteUserClick(id: string, username: string) {
-    if (username === '') {
+    if (username === 'gspada') {
       console.log('Do not delete my user bro...');
     } else {
       setSelectedUserToDelete(id);

@@ -4,7 +4,7 @@ import { IUserProps } from '@/interfaces/user';
 
 export interface IUsersTableProps {
   usersList: IUserProps[];
-  onUserManagementClick: (id: string) => void;
+  onUserManagementClick: (id: string, username: string) => void;
   onDeleteUserClick: (id: string, username: string) => void;
 }
 
@@ -41,7 +41,7 @@ export default function UsersTable(props: IUsersTableProps) {
                   size='sm'
                   variant='success'
                   className='me-2'
-                  onClick={() => props.onUserManagementClick(user.id)}>
+                  onClick={() => props.onUserManagementClick(user.id, user.username)}>
                   <i aria-hidden={true} className='text-white fas fa-wrench'></i>
                 </Button>
               </OverlayTrigger>
